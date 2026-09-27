@@ -114,7 +114,7 @@ body {
 
 #key-modal h2 {
   font-family: var(--font-ui);
-  font-size: clamp(1.65rem, 4.4vw, 2rem);
+  font-size: clamp(2.05rem, 5.2vw, 2.45rem);
   line-height: 1.35;
   color: var(--accent);
   font-weight: 700;
@@ -127,7 +127,7 @@ body {
   color: var(--terracota);
   font-weight: 600;
   margin: 8px 0 18px;
-  font-size: clamp(1.35rem, 3.2vw, 1.55rem);
+  font-size: clamp(1.75rem, 4vw, 1.95rem);
   line-height: 1.4;
   letter-spacing: 0.03em;
   opacity: 0.95;
@@ -136,7 +136,7 @@ body {
 #key-modal input {
   width: 100%;
   font-family: var(--font-ui);
-  font-size: 2rem;
+  font-size: 2.4rem;
   text-align: center;
   padding: 12px 16px;
   border: 2px solid rgba(201, 111, 74, 0.35);
@@ -155,7 +155,7 @@ body {
 #key-modal button {
   margin-top: 18px;
   font-family: var(--font-ui);
-  font-size: 1.65rem;
+  font-size: 2.05rem;
   font-weight: 600;
   letter-spacing: 0.1em;
   padding: 12px 38px;
@@ -181,7 +181,7 @@ body {
   min-height: 1.5em;
   margin-top: 12px;
   font-family: var(--font-ui);
-  font-size: 1.65rem;
+  font-size: 2.05rem;
   color: var(--rose-deep);
   opacity: 0;
   transition: opacity 0.3s ease;
@@ -220,7 +220,7 @@ body {
     linear-gradient(180deg, rgba(255, 255, 255, 0.65), rgba(255, 255, 255, 0) 30%),
     repeating-linear-gradient(0deg, transparent 0 27px, rgba(201, 111, 74, 0.06) 27px 28px),
     var(--paper);
-  max-width: 630px;
+  max-width: 700px;
   width: 100%;
   padding: clamp(32px, 6vw, 58px);
   border-radius: 8px 22px 8px 22px;
@@ -255,7 +255,7 @@ body {
 
 .letter .titulo-carta {
   font-family: var(--font-ui);
-  font-size: 1.45rem;
+  font-size: 1.85rem;
   letter-spacing: 0.2em;
   text-transform: uppercase;
   color: rgba(92, 66, 50, 0.7);
@@ -282,7 +282,7 @@ body {
 
 .letter .saludo {
   font-family: var(--font-ui);
-  font-size: clamp(2.6rem, 7vw, 3.4rem);
+  font-size: clamp(3.0rem, 8vw, 3.85rem);
   color: var(--terracota);
   font-weight: 700;
   margin-bottom: 18px;
@@ -290,7 +290,7 @@ body {
 
 .letter .cuerpo {
   font-family: var(--font-ui);
-  font-size: clamp(1.75rem, 4.8vw, 2.15rem);
+  font-size: clamp(2.15rem, 5.5vw, 2.55rem);
   line-height: 1.65;
   color: var(--ink);
   white-space: pre-line;
@@ -301,7 +301,7 @@ body {
   text-align: center;
   margin: 22px 0 8px;
   color: var(--rose-deep);
-  font-size: 1.7rem;
+  font-size: 2.1rem;
   letter-spacing: 0.6em;
   opacity: 0.85;
 }
@@ -310,7 +310,7 @@ body {
   margin-top: 28px;
   text-align: right;
   font-family: var(--font-ui);
-  font-size: clamp(2.3rem, 6vw, 2.85rem);
+  font-size: clamp(2.7rem, 7vw, 3.25rem);
   color: var(--rose-deep);
   font-weight: 600;
 }

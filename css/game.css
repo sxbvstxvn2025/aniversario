@@ -43,7 +43,7 @@
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
   border: 1px solid rgba(255, 255, 255, 0.15);
   font-family: var(--font-ui);
-  font-size: 1.7rem;
+  font-size: 2.1rem;
   letter-spacing: 0.06em;
   color: #fff8f0;
   z-index: 15;
@@ -64,7 +64,7 @@
 #mute-btn {
   background: none;
   border: none;
-  font-size: 1.45rem;
+  font-size: 1.85rem;
   cursor: pointer;
   padding: 2px 6px;
   border-radius: 8px;
@@ -117,16 +117,16 @@
 #start-screen h1 {
   font-family: var(--font-ui);
   font-weight: 700;
-  font-size: clamp(2.5rem, 6vw, 3.7rem);
+  font-size: clamp(2.9rem, 7vw, 4.2rem);
   color: #f7a8b8;
 }
 
 #start-screen p {
   font-family: var(--font-ui);
-  font-size: clamp(1.5rem, 3.2vw, 1.75rem);
+  font-size: clamp(1.85rem, 4vw, 2.2rem);
   color: #eed9c3;
   opacity: 0.95;
-  max-width: 540px;
+  max-width: 580px;
 }
 
 .controls-hint {
@@ -134,7 +134,7 @@
   gap: 16px;
   margin-top: 6px;
   font-family: var(--font-ui);
-  font-size: 1.45rem;
+  font-size: 1.85rem;
   opacity: 0.95;
 }
 
@@ -148,7 +148,7 @@
 
 #start-screen .hint {
   font-family: var(--font-ui);
-  font-size: 2.1rem;
+  font-size: 2.5rem;
   color: #fcd34d;
   margin-top: 8px;
   animation: bob 1.6s ease-in-out infinite;

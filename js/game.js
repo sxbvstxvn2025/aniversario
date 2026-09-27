@@ -202,7 +202,7 @@ class Game {
         if (this.combo > 1) {
           const praises = ['♥ x' + this.combo, 'Cute! ♥', 'I love you! ✨', 'Amazing! 💕', 'So sweet! 🌸'];
           const text = praises[Math.min(this.combo - 2, praises.length - 1)];
-          this.particles.addFloatingText(text, col.x, col.y - 32, '#d97f7f', 24);
+          this.particles.addFloatingText(text, col.x, col.y - 32, '#d97f7f', 28);
         }
       }
     }
@@ -228,7 +228,7 @@ class Game {
           this.bunny.bounce(CONFIG.BOUNCE_PAD_FORCE, this.particles, this.sound);
           this.combo++;
           this.kitty.onBunnyJump();
-          this.particles.addFloatingText('BOING! ✨', ob.x, mushroomTop - 25, '#e85d75', 24);
+          this.particles.addFloatingText('BOING! ✨', ob.x, mushroomTop - 25, '#e85d75', 28);
           continue;
         }
       }
@@ -296,9 +296,9 @@ class Game {
     // Marcador interno de respaldo por si el HUD externo está oculto
     this.ctx.save();
     this.ctx.fillStyle = 'rgba(92, 66, 50, 0.65)';
-    this.ctx.font = '600 30px "HandwritingUI", "Cormorant Garamond", cursive, serif';
+    this.ctx.font = '600 34px "HandwritingUI", "Cormorant Garamond", cursive, serif';
     this.ctx.textAlign = 'right';
-    this.ctx.fillText('♥ ' + Math.floor(this.score), this.W - 20, 36);
+    this.ctx.fillText('♥ ' + Math.floor(this.score), this.W - 20, 40);
     this.ctx.restore();
   }
 

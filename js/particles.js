@@ -70,7 +70,7 @@ class ParticleSystem {
   }
 
   // Texto flotante de puntos o combo ("+25", "♥ x3!", etc.)
-  addFloatingText(text, x, y, color = '#b85c48', size = 22) {
+  addFloatingText(text, x, y, color = '#b85c48', size = 26) {
     this.floatingTexts.push({
       text,
       x,
