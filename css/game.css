@@ -1,0 +1,160 @@
+/* ============================================================
+   ESCENARIO Y CONTROLES DEL JUEGO (TEMA NOCTURNO)
+   ============================================================ */
+#game-wrap {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: filter 0.9s ease, opacity 0.9s ease;
+}
+
+#game-wrap.frozen {
+  filter: blur(10px) brightness(0.85);
+}
+
+#game {
+  width: min(96vw, 960px);
+  aspect-ratio: 16 / 5;
+  max-height: 70vh;
+  border-radius: 24px;
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.55), 0 6px 20px rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  display: block;
+  background: #0a1024;
+}
+
+/* ============================================================
+   HUD SUPERIOR (PUNTUACIÓN, MUTE Y COMBOS)
+   ============================================================ */
+#hud {
+  position: fixed;
+  top: 18px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  background: rgba(18, 24, 48, 0.88);
+  backdrop-filter: blur(10px);
+  padding: 8px 24px;
+  border-radius: 999px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  font-family: var(--font-ui);
+  font-size: 1.7rem;
+  letter-spacing: 0.06em;
+  color: #fff8f0;
+  z-index: 15;
+  font-variant-numeric: tabular-nums;
+  transition: opacity 0.5s ease;
+}
+
+#hud .heart {
+  color: #ff5c77;
+  animation: pulseHeart 1.4s ease-in-out infinite;
+}
+
+@keyframes pulseHeart {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.18); }
+}
+
+#mute-btn {
+  background: none;
+  border: none;
+  font-size: 1.45rem;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 8px;
+  transition: transform 0.15s ease, background 0.2s ease;
+  line-height: 1;
+}
+
+#mute-btn:hover {
+  transform: scale(1.15);
+  background: rgba(255, 255, 255, 0.15);
+}
+
+#mute-btn:active {
+  transform: scale(0.95);
+}
+
+/* ============================================================
+   PANTALLA DE INICIO / REINTENTO (INGLÉS / NOCTURNA)
+   ============================================================ */
+#start-screen {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  text-align: center;
+  padding: 24px;
+  background: rgba(10, 15, 32, 0.82);
+  backdrop-filter: blur(10px);
+  z-index: 20;
+  cursor: pointer;
+  transition: opacity 0.5s ease;
+}
+
+#start-screen.hide {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.hero-emojis {
+  font-size: clamp(2.4rem, 6vw, 3.4rem);
+  animation: bob 1.8s ease-in-out infinite;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+#start-screen h1 {
+  font-family: var(--font-ui);
+  font-weight: 700;
+  font-size: clamp(2.5rem, 6vw, 3.7rem);
+  color: #f7a8b8;
+}
+
+#start-screen p {
+  font-family: var(--font-ui);
+  font-size: clamp(1.5rem, 3.2vw, 1.75rem);
+  color: #eed9c3;
+  opacity: 0.95;
+  max-width: 540px;
+}
+
+.controls-hint {
+  display: flex;
+  gap: 16px;
+  margin-top: 6px;
+  font-family: var(--font-ui);
+  font-size: 1.45rem;
+  opacity: 0.95;
+}
+
+.controls-hint span {
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff8f0;
+  padding: 4px 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+#start-screen .hint {
+  font-family: var(--font-ui);
+  font-size: 2.1rem;
+  color: #fcd34d;
+  margin-top: 8px;
+  animation: bob 1.6s ease-in-out infinite;
+}
+
+@keyframes bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-7px); }
+}

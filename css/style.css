@@ -1,0 +1,316 @@
+/* ============================================================
+   TIPOGRAFÍA PERSONALIZADA (fontssm.ttf EN LA RAÍZ)
+   ============================================================ */
+@font-face {
+  font-family: 'HandwritingUI';
+  src: url('../fontssm.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ============================================================
+   VARIABLES DE DISEÑO — PALETA COZY / PASTEL
+   ============================================================ */
+:root {
+  --font-ui:   'HandwritingUI', 'Caveat', 'Cormorant Garamond', cursive, Georgia, serif;
+  --bg:        #f6e8d8;   /* beige suave de fondo */
+  --bg-deep:   #eed9c3;
+  --paper:     #fffaf2;   /* papel artesanal */
+  --ink:       #5c4232;   /* café suave (texto) */
+  --terracota: #c96f4a;
+  --rose:      #e8a9a0;
+  --rose-deep: #d97f7f;
+  --accent:    #b85c48;
+  --shadow:    0 20px 60px rgba(92, 66, 50, 0.18), 0 4px 14px rgba(92, 66, 50, 0.10);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html, body {
+  height: 100%;
+}
+
+body {
+  font-family: var(--font-ui);
+  color: var(--ink);
+  background:
+    radial-gradient(1200px 600px at 20% -10%, #1c2444 0%, transparent 60%),
+    radial-gradient(1000px 500px at 110% 110%, #0d1226 0%, transparent 55%),
+    #080c1a;
+  overflow: hidden;
+  touch-action: manipulation;
+  user-select: none;
+}
+
+/* ============================================================
+   OVERLAY + MODAL DE LA CLAVE SECRETA
+   ============================================================ */
+#overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(70, 48, 35, 0.38);
+  backdrop-filter: blur(5px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.6s ease;
+}
+
+#overlay.show {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+#key-modal {
+  background: var(--paper);
+  border-radius: 24px;
+  box-shadow: var(--shadow);
+  padding: 38px 34px 30px;
+  max-width: 440px;
+  width: 100%;
+  text-align: center;
+  transform: translateY(16px) scale(0.96);
+  transition: transform 0.6s cubic-bezier(0.2, 0.9, 0.3, 1.2);
+  border: 1px solid rgba(92, 66, 50, 0.12);
+}
+
+#overlay.show #key-modal {
+  transform: translateY(0) scale(1);
+}
+
+#key-modal.shake {
+  animation: shake 0.45s ease;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-10px); }
+  40% { transform: translateX(8px); }
+  60% { transform: translateX(-6px); }
+  80% { transform: translateX(4px); }
+}
+
+.modal-gatonube-img {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+  display: block;
+  margin: 0 auto 16px;
+  border: 4px solid #ffffff;
+  box-shadow: 0 10px 30px rgba(201, 111, 74, 0.35);
+  animation: floatKitten 3s ease-in-out infinite;
+}
+
+#key-modal h2 {
+  font-family: var(--font-ui);
+  font-size: clamp(1.65rem, 4.4vw, 2rem);
+  line-height: 1.35;
+  color: var(--accent);
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  margin-bottom: 8px;
+}
+
+#key-modal .key-ps-note {
+  font-family: var(--font-ui);
+  color: var(--terracota);
+  font-weight: 600;
+  margin: 8px 0 18px;
+  font-size: clamp(1.35rem, 3.2vw, 1.55rem);
+  line-height: 1.4;
+  letter-spacing: 0.03em;
+  opacity: 0.95;
+}
+
+#key-modal input {
+  width: 100%;
+  font-family: var(--font-ui);
+  font-size: 2rem;
+  text-align: center;
+  padding: 12px 16px;
+  border: 2px solid rgba(201, 111, 74, 0.35);
+  border-radius: 12px;
+  background: #ffffff;
+  color: var(--ink);
+  outline: none;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+#key-modal input:focus {
+  border-color: var(--terracota);
+  box-shadow: 0 0 0 4px rgba(201, 111, 74, 0.14);
+}
+
+#key-modal button {
+  margin-top: 18px;
+  font-family: var(--font-ui);
+  font-size: 1.65rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  padding: 12px 38px;
+  border: none;
+  border-radius: 999px;
+  background: linear-gradient(135deg, var(--terracota), var(--rose-deep));
+  color: #fff8f0;
+  cursor: pointer;
+  box-shadow: 0 8px 20px rgba(201, 111, 74, 0.35);
+  transition: transform 0.15s ease, box-shadow 0.2s ease;
+}
+
+#key-modal button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 26px rgba(201, 111, 74, 0.42);
+}
+
+#key-modal button:active {
+  transform: translateY(0);
+}
+
+#key-error {
+  min-height: 1.5em;
+  margin-top: 12px;
+  font-family: var(--font-ui);
+  font-size: 1.65rem;
+  color: var(--rose-deep);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+#key-error.show {
+  opacity: 1;
+}
+
+/* ============================================================
+   CARTA ROMÁNTICA — ESTILO PAPEL ARTESANAL
+   ============================================================ */
+#letter-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 1.1s ease;
+  overflow-y: auto;
+  user-select: text;
+}
+
+#letter-screen.show {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.letter {
+  position: relative;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.65), rgba(255, 255, 255, 0) 30%),
+    repeating-linear-gradient(0deg, transparent 0 27px, rgba(201, 111, 74, 0.06) 27px 28px),
+    var(--paper);
+  max-width: 630px;
+  width: 100%;
+  padding: clamp(32px, 6vw, 58px);
+  border-radius: 8px 22px 8px 22px;
+  box-shadow:
+    0 30px 80px rgba(70, 48, 35, 0.32),
+    0 6px 18px rgba(70, 48, 35, 0.16),
+    inset 0 0 0 1px rgba(92, 66, 50, 0.08),
+    inset 0 0 60px rgba(232, 169, 160, 0.12);
+  transform: translateY(24px) rotate(-0.6deg);
+  transition: transform 1.1s cubic-bezier(0.2, 0.8, 0.2, 1);
+  margin: auto;
+}
+
+#letter-screen.show .letter {
+  transform: translateY(0) rotate(-0.6deg);
+}
+
+/* Cinta washi tape decorativa arriba */
+.letter::before {
+  content: "";
+  position: absolute;
+  top: -14px;
+  left: 50%;
+  width: 120px;
+  height: 32px;
+  transform: translateX(-50%) rotate(-2deg);
+  background: linear-gradient(90deg, var(--rose), var(--rose-deep));
+  opacity: 0.8;
+  border-radius: 3px;
+  box-shadow: 0 4px 10px rgba(92, 66, 50, 0.2);
+}
+
+.letter .titulo-carta {
+  font-family: var(--font-ui);
+  font-size: 1.45rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(92, 66, 50, 0.7);
+  text-align: center;
+  margin-bottom: 16px;
+}
+
+.letter-kitten-img {
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  object-fit: cover;
+  display: block;
+  margin: 0 auto 18px;
+  border: 3px solid rgba(255, 255, 255, 0.9);
+  box-shadow: 0 8px 24px rgba(92, 66, 50, 0.16);
+  animation: floatKitten 3s ease-in-out infinite;
+}
+
+@keyframes floatKitten {
+  0%, 100% { transform: translateY(0) rotate(-1.5deg); }
+  50% { transform: translateY(-6px) rotate(1.5deg); }
+}
+
+.letter .saludo {
+  font-family: var(--font-ui);
+  font-size: clamp(2.6rem, 7vw, 3.4rem);
+  color: var(--terracota);
+  font-weight: 700;
+  margin-bottom: 18px;
+}
+
+.letter .cuerpo {
+  font-family: var(--font-ui);
+  font-size: clamp(1.75rem, 4.8vw, 2.15rem);
+  line-height: 1.65;
+  color: var(--ink);
+  white-space: pre-line;
+}
+
+.letter .divider {
+  font-family: var(--font-ui);
+  text-align: center;
+  margin: 22px 0 8px;
+  color: var(--rose-deep);
+  font-size: 1.7rem;
+  letter-spacing: 0.6em;
+  opacity: 0.85;
+}
+
+.letter .firma {
+  margin-top: 28px;
+  text-align: right;
+  font-family: var(--font-ui);
+  font-size: clamp(2.3rem, 6vw, 2.85rem);
+  color: var(--rose-deep);
+  font-weight: 600;
+}

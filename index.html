@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>For You 🐰🐱</title>
+
+  <!-- Tipografías: Caveat + Cormorant Garamond -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+
+  <!-- Hojas de estilo modulares -->
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/game.css">
+
+  <style>
+    @font-face {
+      font-family: 'HandwritingUI';
+      src: url('fontssm.ttf') format('truetype');
+      font-weight: normal;
+      font-style: normal;
+      font-display: swap;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HUD de puntuación y controles -->
+  <div id="hud">
+    <span class="heart">♥</span>
+    <span id="score">0</span>
+    <button id="mute-btn" title="Mute / Unmute audio">🔊</button>
+  </div>
+
+  <!-- Escenario del juego -->
+  <div id="game-wrap">
+    <canvas id="game" width="960" height="300"></canvas>
+  </div>
+
+  <!-- Pantalla inicial y de reintento -->
+  <div id="start-screen">
+    <div class="hero-emojis">🐰 🌸 🐱</div>
+    <h1>A Little Journey For You</h1>
+    <p>Run with the bunny and his loyal kitty companion until the very end…</p>
+    <div class="controls-hint">
+      <span>✨ Jump: Space / Tap</span>
+      <span>☁️ Double jump in mid-air</span>
+    </div>
+    <div class="hint">tap the screen / press space to start</div>
+  </div>
+
+  <!-- Overlay de la clave secreta con Gato Nube -->
+  <div id="overlay">
+    <div id="key-modal">
+      <img src="gatonube.webp" alt="Gato Nube" class="modal-gatonube-img">
+      <h2>TYPE HIS NAME TO UNLOCK SOMETHING COOL!!!! (ALL CAPS, NO SPACES)</h2>
+      <p class="key-ps-note">PS. 1914 IS YOUR SCORE, FUNNY NUMBER, RIGHT!???</p>
+      <input id="key-input" type="text" inputmode="text" autocomplete="off" placeholder="NAME HERE..." aria-label="secret name">
+      <br>
+      <button id="key-submit">UNLOCK ✨</button>
+      <div id="key-error">Oops... that's not his name! Try again 🐱☁️</div>
+    </div>
+  </div>
+
+  <!-- Carta romántica -->
+  <div id="letter-screen">
+    <div class="letter">
+      <div class="titulo-carta" id="letter-title">For the love of my life</div>
+      <img src="gatonube.webp" alt="Gatito" class="letter-kitten-img">
+      <div class="saludo" id="letter-greeting">Hola [Nombre]</div>
+      <div class="cuerpo" id="letter-body">No es cierto, mi Yurihermosa, ya cuatro años de relación! Se dice mucho pero para mi se han pasado muy rapido
+
+Cuatro años donde pasamos de ser jovenes pobres, cachondos y alcoholicos a ser UNCS pobres, cachondos y adictos a la chamba
+
+Solo quiero decirte lo maravillosamente orgulloso que me siento de este proyecto de vida, y sobre todo, de nosotros
+
+Se que no he sido perfecto, pero creeme que dia tras dia hago el intento de darte una pequeña parte de todo lo que tu me has dado
+
+Corazón precioso, mi yuyu, permiteme estar contigo mas años
+
+Sigueme dando la dicha de ser tu bebi</div>
+      <div class="divider">♥ ♥ ♥</div>
+      <div class="firma" id="letter-signature">- Sebastian Soto</div>
+    </div>
+  </div>
+
+  <!-- Scripts modulares -->
+  <script src="js/config.js"></script>
+  <script src="js/audio.js"></script>
+  <script src="js/particles.js"></script>
+  <script src="js/background.js"></script>
+  <script src="js/entities/Bunny.js"></script>
+  <script src="js/entities/Kitty.js"></script>
+  <script src="js/entities/Obstacle.js"></script>
+  <script src="js/entities/Collectible.js"></script>
+  <script src="js/game.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
