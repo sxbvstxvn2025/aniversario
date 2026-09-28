@@ -79,9 +79,10 @@ class SquirrelBoss {
         particles.addFloatingText('¡DERROTADA! 🏆✨', this.x, this.y - 45, '#fcd34d', 34);
       }
     } else {
-      // Retroceso cómico al recibir golpe
+      // Retroceso cómico al recibir golpe y cancelar picada
       this.state = 'HOVER';
-      this.x += 35;
+      this.attackCooldown = Math.max(this.attackCooldown, 90);
+      this.x = Math.min(this.W - 60, this.x + 35);
       this.y = this.baseY - 15;
     }
 
@@ -169,11 +170,13 @@ class SquirrelBoss {
           }
         }
 
-        // Generar ocasionalmente bellotas doradas o fresas para que el gatito dispare
-        if (this.t % 210 === 0 && gameCollectibles) {
-          gameCollectibles.push(new window.Collectible(this.W + 20, this.groundY - 110, 'star'));
+        // Generar estrellas y corazones constantemente para alimentar el rayo de Kitty
+        if (this.t % 85 === 0 && gameCollectibles) {
+          const cType = Math.random() > 0.4 ? 'star' : 'heart';
+          const cY = this.groundY - (60 + Math.random() * 50);
+          gameCollectibles.push(new window.Collectible(this.W + 20, cY, cType));
           if (particles) {
-            particles.sparkle(this.W, this.groundY - 110, 8, '#f1c40f');
+            particles.sparkle(this.W, cY, 6, '#f1c40f');
           }
         }
         break;
@@ -193,26 +196,27 @@ class SquirrelBoss {
       }
 
       case 'ATTACK_SWOOP': {
-        // Picada en arco hacia abajo y regreso a su puesto
-        this.swoopProgress += 0.022;
+        // Picada rasante en arco barriendo toda la pantalla y volviendo por la derecha
+        this.swoopProgress += 0.016;
         const p = this.swoopProgress;
 
-        if (p < 0.5) {
-          // Bajar en picada hacia la izquierda (cerca del suelo)
-          const sub = p / 0.5;
-          this.x = this.hoverX - sub * (this.hoverX - 180);
-          this.y = this.baseY + sub * (this.groundY - this.baseY - 26);
+        if (p < 0.6) {
+          // Bajar en picada rasante cruzando la pantalla de derecha a izquierda
+          const sub = p / 0.6;
+          this.x = this.hoverX - sub * (this.hoverX - (-60));
+          // Arco que desciende cerca del suelo para poder ser pisoteada (¡BONK!)
+          this.y = this.baseY + Math.sin(sub * Math.PI) * (this.groundY - this.baseY - 32);
         } else if (p < 1.0) {
-          // Remontar vuelo hacia la derecha
-          const sub = (p - 0.5) / 0.5;
-          this.x = 180 + sub * (this.hoverX - 180);
-          this.y = (this.groundY - 26) - sub * (this.groundY - this.baseY - 26);
+          // Reingreso volando suavemente desde la derecha
+          const sub = (p - 0.6) / 0.4;
+          this.x = (this.W + 80) - sub * (this.W + 80 - this.hoverX);
+          this.y = this.baseY;
         } else {
           this.state = 'HOVER';
-          this.attackCooldown = 120 + Math.floor(Math.random() * 50);
+          this.attackCooldown = 130 + Math.floor(Math.random() * 50);
         }
 
-        if (particles && Math.random() > 0.4) {
+        if (particles && Math.random() > 0.35) {
           particles.sparkle(this.x, this.y, 2, '#e67e22');
         }
         break;

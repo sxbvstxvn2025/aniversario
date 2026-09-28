@@ -108,6 +108,8 @@ class Game {
     this.continuingAfterLetter = false;
     this.screenShake = 0;
     this.graceFrames = 0;
+    this.bunnyLives = 3;
+    this.kittySupportTimer = 0;
 
     this.obstacles = [];
     this.collectibles = [];
@@ -132,18 +134,18 @@ class Game {
     this.frozen = false;
     this.running = true;
 
-    // Despejar cualquier obstáculo para dar exactamente 5 segundos limpios
+    // Despejar cualquier obstáculo para dar exactamente 3 segundos limpios
     this.obstacles = [];
-    this.graceFrames = 300; // 5 segundos enteros a 60 FPS
-    this.nextSpawn = 360;   // Retrasar el primer obstáculo después de los 5 segundos
+    this.graceFrames = 180; // 3 segundos exactos a 60 FPS
+    this.nextSpawn = 240;   // Retrasar el primer obstáculo después de los 3 segundos
 
     this.ui.unfreezeWrap();
     this.ui.showGameHud();
-    this.ui.showGraceBanner('¡AGARRA LA ONDA! 5s sin obstáculos 💨');
+    this.ui.showGraceBanner('¡AGARRA LA ONDA! 3s sin obstáculos 💨');
 
     if (this.sound) this.sound.bounce();
-    this.particles.confettiBurst(this.bunny.x, this.bunny.y - 20, 30);
-    this.particles.addFloatingText('¡5s PARA AGARRAR LA ONDA! 🛡️✨', this.bunny.x, this.bunny.y - 45, '#fcd34d', 28);
+    this.particles.confettiBurst(this.bunny.x, this.bunny.y - 20, 25);
+    this.particles.addFloatingText('¡A CORRER! 🐾✨', this.bunny.x, this.bunny.y - 45, '#fcd34d', 28);
   }
 
   triggerBossFight() {
@@ -151,9 +153,12 @@ class Game {
     this.obstacles = []; // Despejar obstáculos normales para enfocar la batalla
     this.boss = new window.SquirrelBoss(this.W, this.groundY);
     this.screenShake = 16;
+    this.bunnyLives = 3;
+    this.kittySupportTimer = 0;
+    this.bunny.invulnTimer = 0;
 
     this.ui.showBossWarning();
-    this.ui.showBossHud(this.boss.hp, this.boss.maxHp);
+    this.ui.showBossHud(this.boss.hp, this.boss.maxHp, this.bunnyLives);
     if (this.sound) this.sound.bossAlert();
     this.particles.sparkle(this.W - 100, this.groundY - 140, 20, '#ff4757');
   }
@@ -214,8 +219,8 @@ class Game {
         this.ui.updateGraceBanner(`¡AGARRA LA ONDA! ${secsLeft}s sin obstáculos 💨`);
       }
 
-      // Spawning de coleccionables amigables para practicar saltos
-      if (this.graceFrames === 220 || this.graceFrames === 120) {
+      // Spawning de coleccionables amigables para practicar saltos (a los 2s y 1s)
+      if (this.graceFrames === 120 || this.graceFrames === 60) {
         this.collectibles.push(new window.Collectible(this.W + 20, this.groundY - 105, 'star'));
       }
 
@@ -240,6 +245,21 @@ class Game {
     // 8.5 Actualizar Jefe Final (Ardilla Malévola)
     if (this.bossActive && this.boss) {
       this.boss.update(this.bunny, this.kitty, this.particles, this.sound, this.collectibles);
+
+      // Disparo de apoyo de Kitty si pasan ~4 segundos sin disparar por coleccionables
+      if (!this.boss.isDefeated) {
+        this.kittySupportTimer = (this.kittySupportTimer || 0) + 1;
+        if (this.kittySupportTimer >= 220) {
+          this.kittySupportTimer = 0;
+          this.kitty.fireHeartBeam(this.boss, this.sound, this.particles, (hitBoss) => {
+            if (hitBoss) {
+              this.ui.updateBossHp(hitBoss.hp, hitBoss.maxHp);
+              this.screenShake = 10;
+            }
+          });
+          this.particles.addFloatingText('¡APOYO GATUNO! 🐾💖', this.kitty.x, this.kitty.y - 30, '#ff4757', 24);
+        }
+      }
 
       // Revisar si el jefe terminó su animación de derrota
       if (this.boss.isDefeated && !this.bossDefeated) {
@@ -344,7 +364,13 @@ class Game {
 
         // Si la batalla de jefe está activa, el gatito dispara su Rayo Gatuno
         if (this.bossActive && this.boss && !this.boss.isDefeated) {
-          this.kitty.fireHeartBeam(this.boss, this.sound, this.particles);
+          this.kittySupportTimer = 0;
+          this.kitty.fireHeartBeam(this.boss, this.sound, this.particles, (hitBoss) => {
+            if (hitBoss) {
+              this.ui.updateBossHp(hitBoss.hp, hitBoss.maxHp);
+              this.screenShake = 12;
+            }
+          });
           this.particles.addFloatingText('¡RAYO GATUNO! 🐾💖', col.x, col.y - 48, '#ff4757', 26);
         }
 
@@ -385,7 +411,7 @@ class Game {
       }
 
       // Colisión normal (tropiezo)
-      if (this.graceFrames > 0) continue; // Inmune a obstáculos durante los 5 segundos de gracia
+      if (this.graceFrames > 0) continue; // Inmune a obstáculos durante el período de gracia
       if (
         bHit.x < oHit.x + oHit.w &&
         bHit.x + bHit.w > oHit.x &&
@@ -402,13 +428,17 @@ class Game {
       const bossHit = this.boss.getHitbox();
 
       // Colisión con bellotas arrojadas por la ardilla
-      for (const a of this.boss.acorns) {
+      for (let i = this.boss.acorns.length - 1; i >= 0; i--) {
+        const a = this.boss.acorns[i];
         const dx = (bHit.x + bHit.w / 2) - a.x;
         const dy = (bHit.y + bHit.h / 2) - a.y;
         const dist = Math.hypot(dx, dy);
         if (dist < a.r + 14) {
-          this.gameOver();
-          return;
+          if (this.bunny.invulnTimer <= 0) {
+            this.boss.acorns.splice(i, 1);
+            this.takePlayerDamage('¡GOLPE DE BELLOTA! 🌰💥');
+            break;
+          }
         }
       }
 
@@ -420,19 +450,39 @@ class Game {
         bHit.y + bHit.h > bossHit.y
       ) {
         // Si el conejito viene cayendo sobre la ardilla desde arriba: ¡BONK!
-        if (this.bunny.vy >= 0 && this.bunny.y <= this.boss.y - 2) {
+        const footY = this.bunny.y;
+        const bossTop = this.boss.y - 10;
+
+        if (this.bunny.vy >= 0 && footY <= bossTop + 28) {
           this.boss.takeDamage(1, this.particles, this.sound);
           this.ui.updateBossHp(this.boss.hp, this.boss.maxHp);
-          this.bunny.bounce(CONFIG.BOUNCE_PAD_FORCE * 1.15, this.particles, this.sound);
-          this.screenShake = 14;
+          this.bunny.bounce(CONFIG.BOUNCE_PAD_FORCE * 1.25, this.particles, this.sound);
+          this.screenShake = 16;
           this.combo++;
           this.kitty.onBunnyJump();
-          this.particles.addFloatingText('¡BONK PRO! 💥', this.bunny.x, this.bunny.y - 25, '#fcd34d', 28);
-        } else if (this.boss.invulnTimer <= 0) {
-          this.gameOver();
-          return;
+          this.particles.confettiBurst(this.bunny.x, this.bunny.y, 25);
+          this.particles.addFloatingText('¡PISOTÓN BONK! 💥', this.bunny.x, this.bunny.y - 35, '#fcd34d', 30);
+        } else if (this.boss.invulnTimer <= 0 && this.bunny.invulnTimer <= 0) {
+          // Daño a las vidas de los Babys (NO instakill)
+          this.takePlayerDamage('¡CUIDADO CON LA ARDILLA! 🐿️💥');
         }
       }
+    }
+  }
+
+  takePlayerDamage(reasonText) {
+    this.bunnyLives--;
+    this.bunny.invulnTimer = 85; // 1.4 segundos de parpadeo seguro
+    this.screenShake = 14;
+    this.combo = 0;
+    this.ui.updatePlayerHp(this.bunnyLives);
+
+    if (this.sound) this.sound.hit();
+    this.particles.puff(this.bunny.x, this.bunny.y, 8, '#ff4757');
+    this.particles.addFloatingText(reasonText, this.bunny.x, this.bunny.y - 30, '#ff4757', 26);
+
+    if (this.bunnyLives <= 0) {
+      this.gameOver();
     }
   }
 

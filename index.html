@@ -85,17 +85,16 @@ Sigueme dando la dicha de ser tu bebi</div>
 
       <!-- Botón para continuar el juego tras leer la carta -->
       <div class="continue-wrap">
-        <button id="continue-game-btn" class="continue-game-btn">CONTINUAR Y PELEAR CON LA ARDILLA 🐿️⚔️</button>
-        <div class="continue-hint">¿Pensaste que eso era todo? La ardilla malévola acecha a los 2809 puntos... 👀⚔️</div>
+        <button id="continue-game-btn" class="continue-game-btn">SEGUIR JUGANDO 🎮🐾</button>
       </div>
     </div>
   </div>
 
-  <!-- Banner de Gracia (5 segundos para agarrar la onda) -->
+  <!-- Banner de Gracia (período seguro para agarrar la onda) -->
   <div id="grace-banner" class="grace-banner">
     <div class="grace-content">
       <span class="grace-icon">🛡️✨</span>
-      <span id="grace-text" class="grace-text">¡AGARRA LA ONDA! 5s sin obstáculos 💨</span>
+      <span id="grace-text" class="grace-text">¡AGARRA LA ONDA! 3s sin obstáculos 💨</span>
     </div>
   </div>
 
@@ -108,11 +107,18 @@ Sigueme dando la dicha de ser tu bebi</div>
     </div>
   </div>
 
-  <!-- Barra de vida del Jefe Final -->
+  <!-- Barra de vida del Jefe Final y vidas de Los Babys -->
   <div id="boss-hud" class="boss-hud">
     <div class="boss-hud-inner">
-      <span class="boss-name">🐿️ LORD BELLOTA (ARDILLA MALÉVOLA)</span>
-      <div class="boss-hp-bar" id="boss-hp-bar"></div>
+      <div class="player-hp-wrap">
+        <span class="player-hp-label">BABYS:</span>
+        <span id="player-hp-bar" class="player-hp-bar">❤️❤️❤️</span>
+      </div>
+      <div class="hud-vs-badge">VS</div>
+      <div class="boss-hp-wrap">
+        <span class="boss-name">🐿️ LORD BELLOTA</span>
+        <div class="boss-hp-bar" id="boss-hp-bar"></div>
+      </div>
     </div>
   </div>
 

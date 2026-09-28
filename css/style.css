@@ -491,23 +491,54 @@ body {
 }
 
 .boss-hud-inner {
-  background: rgba(24, 18, 36, 0.88);
+  background: rgba(24, 18, 36, 0.92);
   backdrop-filter: blur(8px);
-  padding: 8px 18px;
+  padding: 6px 16px;
   border-radius: 999px;
-  border: 2px solid rgba(245, 158, 11, 0.5);
-  box-shadow: 0 6px 25px rgba(0, 0, 0, 0.45);
+  border: 2px solid rgba(245, 158, 11, 0.6);
+  box-shadow: 0 6px 25px rgba(0, 0, 0, 0.5);
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
+}
+
+.player-hp-wrap, .boss-hp-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.player-hp-label {
+  font-family: var(--font-ui);
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: #f472b6;
+  letter-spacing: 0.03em;
+}
+
+.player-hp-bar {
+  font-size: 1.35rem;
+  letter-spacing: 2px;
+  display: inline-block;
+}
+
+.hud-vs-badge {
+  font-family: var(--font-ui);
+  font-size: 1.15rem;
+  font-weight: 900;
+  background: #ef4444;
+  color: #fff;
+  padding: 1px 7px;
+  border-radius: 6px;
+  box-shadow: 0 0 8px rgba(239, 68, 68, 0.6);
 }
 
 .boss-name {
   font-family: var(--font-ui);
-  font-size: 1.45rem;
+  font-size: 1.35rem;
   font-weight: 700;
   color: #fcd34d;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.03em;
 }
 
 .boss-hp-bar {
@@ -516,7 +547,7 @@ body {
 }
 
 .boss-hp-dot {
-  font-size: 1.5rem;
+  font-size: 1.4rem;
   transition: transform 0.2s ease, opacity 0.3s ease;
 }
 

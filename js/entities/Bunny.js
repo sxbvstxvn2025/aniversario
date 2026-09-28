@@ -23,6 +23,9 @@ class Bunny {
 
     // Estado especial de doble salto (voltereta o aleteo de orejas)
     this.doubleJumpEffect = 0;
+
+    // Frames de invulnerabilidad / parpadeo
+    this.invulnTimer = 0;
   }
 
   reset() {
@@ -37,6 +40,7 @@ class Bunny {
     this.coyoteTimer = 0;
     this.jumpBuffer = 0;
     this.doubleJumpEffect = 0;
+    this.invulnTimer = 0;
   }
 
   queueJump() {
@@ -136,6 +140,10 @@ class Bunny {
         if (particles) particles.puff(this.x, this.groundY, 5);
       }
     }
+
+    if (this.invulnTimer > 0) {
+      this.invulnTimer--;
+    }
   }
 
   getHitbox() {
@@ -152,6 +160,11 @@ class Bunny {
     ctx.save();
     ctx.translate(this.x, this.y);
     ctx.scale(this.scaleX, this.scaleY);
+
+    // Parpadeo durante frames de inmunidad tras recibir golpe
+    if (this.invulnTimer > 0 && Math.floor(this.invulnTimer / 4) % 2 === 0) {
+      ctx.globalAlpha = 0.35;
+    }
 
     const bodyY = -28;
 

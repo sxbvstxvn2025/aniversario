@@ -19,6 +19,7 @@ class UIManager {
     this.bossWarning = document.getElementById('boss-warning');
     this.bossHud = document.getElementById('boss-hud');
     this.bossHpBar = document.getElementById('boss-hp-bar');
+    this.playerHpBar = document.getElementById('player-hp-bar');
     this.victoryModal = document.getElementById('victory-modal');
     this.victoryRestartBtn = document.getElementById('victory-restart-btn');
     this.graceBanner = document.getElementById('grace-banner');
@@ -217,10 +218,20 @@ class UIManager {
     }, 4500);
   }
 
-  showBossHud(hp, maxHp) {
+  showBossHud(hp, maxHp, playerHp = 3) {
     if (!this.bossHud) return;
     this.bossHud.classList.add('show');
     this.updateBossHp(hp, maxHp);
+    this.updatePlayerHp(playerHp);
+  }
+
+  updatePlayerHp(playerHp) {
+    if (!this.playerHpBar) return;
+    let hearts = '';
+    for (let i = 0; i < 3; i++) {
+      hearts += i < playerHp ? '❤️' : '🖤';
+    }
+    this.playerHpBar.textContent = hearts;
   }
 
   updateBossHp(hp, maxHp) {
