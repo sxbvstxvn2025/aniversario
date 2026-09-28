@@ -53,6 +53,18 @@ class ParallaxBackground {
     }));
   }
 
+  resize(canvasWidth, canvasHeight, groundY) {
+    this.W = canvasWidth;
+    this.H = canvasHeight;
+    this.groundY = groundY;
+
+    // Reubicar estrellas que queden fuera del nuevo canvas
+    for (const s of this.stars) {
+      if (s.x > this.W) s.x = Math.random() * this.W;
+      if (s.y > this.groundY * 0.65) s.y = Math.random() * (this.groundY * 0.65);
+    }
+  }
+
   update(speed) {
     this.dist += speed;
     this.time += 0.02;

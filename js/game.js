@@ -37,6 +37,43 @@ class Game {
     this.rafId = null;
     this.acc = 0;
     this.lastTime = 0;
+
+    this.setupResponsiveCanvas();
+  }
+
+  setupResponsiveCanvas() {
+    const updateSize = () => {
+      // Pantalla móvil vertical o pantallas angostas: zoom cercano para personajes adorables y grandes
+      const isMobile = window.innerWidth <= 640 || (window.innerWidth <= 900 && window.innerHeight > window.innerWidth);
+      const targetW = isMobile ? 480 : 960;
+      const targetH = 300;
+
+      if (this.cv.width !== targetW || this.cv.height !== targetH) {
+        this.cv.width = targetW;
+        this.cv.height = targetH;
+        this.W = targetW;
+        this.H = targetH;
+        this.groundY = this.H - 52;
+
+        if (this.bg) {
+          this.bg.resize(this.W, this.H, this.groundY);
+        }
+        if (this.bunny) {
+          this.bunny.groundY = this.groundY;
+          this.bunny.x = isMobile ? 70 : 90;
+          if (this.bunny.onGround) this.bunny.y = this.groundY;
+        }
+        if (this.kitty) {
+          this.kitty.groundY = this.groundY;
+          this.kitty.x = isMobile ? 28 : 38;
+          if (this.kitty.onGround) this.kitty.y = this.groundY;
+        }
+      }
+    };
+
+    window.addEventListener('resize', updateSize);
+    window.addEventListener('orientationchange', updateSize);
+    updateSize();
   }
 
   start() {
@@ -47,7 +84,7 @@ class Game {
     this.combo = 0;
     this.comboTimer = 0;
     this.speed = CONFIG.SPEED_START;
-    this.nextSpawn = 400;
+    this.nextSpawn = this.W < 700 ? 280 : 400;
 
     this.obstacles = [];
     this.collectibles = [];
@@ -120,7 +157,9 @@ class Game {
     if (this.nextSpawn <= 0) {
       this.spawnPattern();
       const speedRatio = this.speed / CONFIG.SPEED_START;
-      this.nextSpawn = (CONFIG.SPAWN_GAP_MIN + Math.random() * CONFIG.SPAWN_GAP_VAR) * speedRatio;
+      const minGap = this.W < 700 ? 300 : CONFIG.SPAWN_GAP_MIN;
+      const varGap = this.W < 700 ? 320 : CONFIG.SPAWN_GAP_VAR;
+      this.nextSpawn = (minGap + Math.random() * varGap) * speedRatio;
     }
 
     // 10. Partículas

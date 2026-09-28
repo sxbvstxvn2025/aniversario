@@ -25,6 +25,17 @@
   background: #0a1024;
 }
 
+/* Optimización móvil: el canvas se vuelve 2x más alto con zoom cercano y personajes grandes */
+@media (max-width: 640px), (max-width: 900px) and (orientation: portrait) {
+  #game {
+    width: min(98vw, 480px);
+    aspect-ratio: 8 / 5; /* 480 / 300 */
+    max-height: 55vh;
+    border-radius: 18px;
+    box-shadow: 0 16px 45px rgba(0, 0, 0, 0.5);
+  }
+}
+
 /* ============================================================
    HUD SUPERIOR (PUNTUACIÓN, MUTE Y COMBOS)
    ============================================================ */
@@ -123,18 +134,22 @@
 
 #start-screen p {
   font-family: var(--font-ui);
-  font-size: clamp(1.85rem, 4vw, 2.2rem);
+  font-size: clamp(2.4rem, 6.2vw, 3.1rem);
+  line-height: 1.45;
   color: #eed9c3;
-  opacity: 0.95;
-  max-width: 580px;
+  opacity: 0.98;
+  max-width: 640px;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
 }
 
 .controls-hint {
   display: flex;
-  gap: 16px;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
   margin-top: 6px;
   font-family: var(--font-ui);
-  font-size: 1.85rem;
+  font-size: clamp(1.65rem, 4.4vw, 2.05rem);
   opacity: 0.95;
 }
 
@@ -148,7 +163,7 @@
 
 #start-screen .hint {
   font-family: var(--font-ui);
-  font-size: 2.5rem;
+  font-size: clamp(2.3rem, 6vw, 2.8rem);
   color: #fcd34d;
   margin-top: 8px;
   animation: bob 1.6s ease-in-out infinite;

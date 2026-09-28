@@ -84,6 +84,13 @@ body {
   border: 1px solid rgba(92, 66, 50, 0.12);
 }
 
+@media (max-width: 480px) {
+  #key-modal {
+    padding: 28px 18px 22px;
+    border-radius: 20px;
+  }
+}
+
 #overlay.show #key-modal {
   transform: translateY(0) scale(1);
 }
