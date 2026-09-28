@@ -136,9 +136,9 @@ class UIManager {
     const p = this.startScr.querySelector('p');
     const hint = this.startScr.querySelector('.hint');
 
-    if (h1) h1.textContent = 'Almost there! 🐰🐾';
-    if (p) p.textContent = `You scored ${score} points. The kitty and bunny believe in you…`;
-    if (hint) hint.textContent = 'tap here or press space to try together again';
+    if (h1) h1.textContent = 'Casi!!! 🐰🐾';
+    if (p) p.textContent = `Obtuviste ${score} puntotes. Yuyi y bebi creen en ti…`;
+    if (hint) hint.textContent = 'Presiona en la pantalla o en la tecla de espacio para jugar de nuevo!!';
 
     this.startScr.classList.remove('hide');
   }
