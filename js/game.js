@@ -33,6 +33,18 @@ class Game {
     this.speed = CONFIG.SPEED_START;
     this.nextSpawn = 450;
 
+    // Estado del Jefe Final (Ardilla Malévola) y continuación tras la carta
+    this.boss = null;
+    this.bossActive = false;
+    this.bossDefeated = false;
+    this.hasUnlockedLetter = false;
+    this.continuingAfterLetter = false;
+    this.screenShake = 0;
+
+    // Callbacks de UI para continuar tras la carta y reiniciar tras victoria
+    this.ui.onContinueGameCallback = () => this.continueAfterLetter();
+    this.ui.onVictoryRestartCallback = () => this.start();
+
     // Control de bucle (Fixed Timestep)
     this.rafId = null;
     this.acc = 0;
@@ -68,6 +80,9 @@ class Game {
           this.kitty.x = isMobile ? 28 : 38;
           if (this.kitty.onGround) this.kitty.y = this.groundY;
         }
+        if (this.boss) {
+          this.boss.resize(this.W, this.groundY);
+        }
       }
     };
 
@@ -86,6 +101,13 @@ class Game {
     this.speed = CONFIG.SPEED_START;
     this.nextSpawn = this.W < 700 ? 280 : 400;
 
+    this.boss = null;
+    this.bossActive = false;
+    this.bossDefeated = false;
+    this.hasUnlockedLetter = false;
+    this.continuingAfterLetter = false;
+    this.screenShake = 0;
+
     this.obstacles = [];
     this.collectibles = [];
     this.particles.reset();
@@ -94,9 +116,37 @@ class Game {
 
     this.ui.updateScore(0);
     this.ui.hideStartScreen();
+    this.ui.hideBossHud();
+    this.ui.hideVictoryModal();
     this.ui.unfreezeWrap();
 
     if (this.sound) this.sound.init();
+  }
+
+  continueAfterLetter() {
+    this.continuingAfterLetter = true;
+    this.hasUnlockedLetter = true;
+    this.won = false;
+    this.frozen = false;
+    this.running = true;
+
+    this.ui.unfreezeWrap();
+    this.ui.showGameHud();
+    if (this.sound) this.sound.bounce();
+    this.particles.confettiBurst(this.bunny.x, this.bunny.y - 20, 30);
+    this.particles.addFloatingText('¡A POR LA ARDILLA! ⚔️🐿️', this.bunny.x, this.bunny.y - 45, '#fcd34d', 28);
+  }
+
+  triggerBossFight() {
+    this.bossActive = true;
+    this.obstacles = []; // Despejar obstáculos normales para enfocar la batalla
+    this.boss = new window.SquirrelBoss(this.W, this.groundY);
+    this.screenShake = 16;
+
+    this.ui.showBossWarning();
+    this.ui.showBossHud(this.boss.hp, this.boss.maxHp);
+    if (this.sound) this.sound.bossAlert();
+    this.particles.sparkle(this.W - 100, this.groundY - 140, 20, '#ff4757');
   }
 
   jump() {
@@ -127,10 +177,15 @@ class Game {
       }
     }
 
-    // 4. ¿Meta alcanzada? (Desbloquear carta romántica)
-    if (this.score >= CONFIG.TARGET_SCORE && !this.won) {
+    // 4. ¿Meta de la carta alcanzada? (Desbloquear carta romántica a 1914 pts)
+    if (this.score >= CONFIG.TARGET_SCORE && !this.won && !this.hasUnlockedLetter) {
       this.triggerEasterEgg();
       return;
+    }
+
+    // 4.5 ¿Meta de la batalla final alcanzada? (Ardilla Malévola a 2809 pts)
+    if (this.score >= (CONFIG.BOSS_SCORE || 2809) && !this.bossActive && !this.bossDefeated) {
+      this.triggerBossFight();
     }
 
     // 5. Actualizar fondo continuo y suave
@@ -138,7 +193,7 @@ class Game {
 
     // 6. Actualizar jugador (conejito) y compañero (gatito)
     this.bunny.update(this.speed, this.particles, this.sound);
-    this.kitty.update(this.bunny, this.speed, this.particles);
+    this.kitty.update(this.bunny, this.speed, this.particles, this.sound);
 
     // 7. Actualizar obstáculos
     for (const ob of this.obstacles) {
@@ -152,14 +207,33 @@ class Game {
     }
     this.collectibles = this.collectibles.filter(col => col.x > -50 && !col.collected);
 
-    // 9. Spawn dinámico de patrones divertidos
-    this.nextSpawn -= this.speed;
-    if (this.nextSpawn <= 0) {
-      this.spawnPattern();
-      const speedRatio = this.speed / CONFIG.SPEED_START;
-      const minGap = this.W < 700 ? 300 : CONFIG.SPAWN_GAP_MIN;
-      const varGap = this.W < 700 ? 320 : CONFIG.SPAWN_GAP_VAR;
-      this.nextSpawn = (minGap + Math.random() * varGap) * speedRatio;
+    // 8.5 Actualizar Jefe Final (Ardilla Malévola)
+    if (this.bossActive && this.boss) {
+      this.boss.update(this.bunny, this.kitty, this.particles, this.sound, this.collectibles);
+
+      // Revisar si el jefe terminó su animación de derrota
+      if (this.boss.isDefeated && !this.bossDefeated) {
+        if (this.boss.defeatTimer <= 30) {
+          this.bossDefeated = true;
+          this.bossActive = false;
+          this.frozen = true;
+          this.ui.showVictoryModal(Math.floor(this.score));
+        }
+      }
+    }
+
+    if (this.screenShake > 0) this.screenShake--;
+
+    // 9. Spawn dinámico de patrones divertidos (pausado durante la batalla de jefe)
+    if (!this.bossActive) {
+      this.nextSpawn -= this.speed;
+      if (this.nextSpawn <= 0) {
+        this.spawnPattern();
+        const speedRatio = this.speed / CONFIG.SPEED_START;
+        const minGap = this.W < 700 ? 300 : CONFIG.SPAWN_GAP_MIN;
+        const varGap = this.W < 700 ? 320 : CONFIG.SPAWN_GAP_VAR;
+        this.nextSpawn = (minGap + Math.random() * varGap) * speedRatio;
+      }
     }
 
     // 10. Partículas
@@ -170,6 +244,8 @@ class Game {
   }
 
   spawnPattern() {
+    if (this.bossActive) return;
+
     // Tipos de patrones aleatorios para gameplay entretenido
     const patternType = Math.floor(Math.random() * 5);
     const spawnX = this.W + 40;
@@ -236,6 +312,12 @@ class Game {
         // Avisar al gatito para que purree con corazoncitos
         this.kitty.onBunnyCollect();
 
+        // Si la batalla de jefe está activa, el gatito dispara su Rayo Gatuno
+        if (this.bossActive && this.boss && !this.boss.isDefeated) {
+          this.kitty.fireHeartBeam(this.boss, this.sound, this.particles);
+          this.particles.addFloatingText('¡RAYO GATUNO! 🐾💖', col.x, col.y - 48, '#ff4757', 26);
+        }
+
         // Texto flotante
         this.particles.addFloatingText(`+${earned}`, col.x, col.y - 12);
         if (this.combo > 1) {
@@ -283,6 +365,44 @@ class Game {
         return;
       }
     }
+
+    // 3. Revisar colisiones en la batalla contra la Ardilla Malévola
+    if (this.bossActive && this.boss && !this.boss.isDefeated) {
+      const bossHit = this.boss.getHitbox();
+
+      // Colisión con bellotas arrojadas por la ardilla
+      for (const a of this.boss.acorns) {
+        const dx = (bHit.x + bHit.w / 2) - a.x;
+        const dy = (bHit.y + bHit.h / 2) - a.y;
+        const dist = Math.hypot(dx, dy);
+        if (dist < a.r + 14) {
+          this.gameOver();
+          return;
+        }
+      }
+
+      // Colisión con el cuerpo de la ardilla durante su picada rasante
+      if (
+        bHit.x < bossHit.x + bossHit.w &&
+        bHit.x + bHit.w > bossHit.x &&
+        bHit.y < bossHit.y + bossHit.h &&
+        bHit.y + bHit.h > bossHit.y
+      ) {
+        // Si el conejito viene cayendo sobre la ardilla desde arriba: ¡BONK!
+        if (this.bunny.vy >= 0 && this.bunny.y <= this.boss.y - 2) {
+          this.boss.takeDamage(1, this.particles, this.sound);
+          this.ui.updateBossHp(this.boss.hp, this.boss.maxHp);
+          this.bunny.bounce(CONFIG.BOUNCE_PAD_FORCE * 1.15, this.particles, this.sound);
+          this.screenShake = 14;
+          this.combo++;
+          this.kitty.onBunnyJump();
+          this.particles.addFloatingText('¡BONK PRO! 💥', this.bunny.x, this.bunny.y - 25, '#fcd34d', 28);
+        } else if (this.boss.invulnTimer <= 0) {
+          this.gameOver();
+          return;
+        }
+      }
+    }
   }
 
   gameOver() {
@@ -308,9 +428,17 @@ class Game {
 
   draw() {
     this.ctx.clearRect(0, 0, this.W, this.H);
+    this.ctx.save();
+
+    // Temblor de pantalla (Screen Shake en momentos de acción)
+    if (this.screenShake > 0) {
+      const s = this.screenShake * 0.45;
+      this.ctx.translate((Math.random() - 0.5) * s, (Math.random() - 0.5) * s);
+    }
 
     // Fondo Parallax suave y continuo
-    const progress = Math.min(1, this.score / CONFIG.TARGET_SCORE);
+    const maxProgScore = this.bossActive ? (CONFIG.BOSS_SCORE || 2809) : CONFIG.TARGET_SCORE;
+    const progress = Math.min(1, this.score / maxProgScore);
     this.bg.draw(this.ctx, progress);
 
     // Obstáculos
@@ -321,6 +449,11 @@ class Game {
     // Coleccionables
     for (const col of this.collectibles) {
       col.draw(this.ctx);
+    }
+
+    // Jefe Final (Ardilla Malévola)
+    if (this.bossActive && this.boss) {
+      this.boss.draw(this.ctx);
     }
 
     // Gatito compañero (sigue de cerca)
@@ -338,6 +471,8 @@ class Game {
     this.ctx.font = '600 34px "HandwritingUI", "Cormorant Garamond", cursive, serif';
     this.ctx.textAlign = 'right';
     this.ctx.fillText('♥ ' + Math.floor(this.score), this.W - 20, 40);
+    this.ctx.restore();
+
     this.ctx.restore();
   }
 

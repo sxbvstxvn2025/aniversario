@@ -159,6 +159,61 @@ class SoundEngine {
       offset += n.d * 900;
     });
   }
+
+  // Alerta dramática de jefe
+  bossAlert() {
+    if (this.muted) return;
+    this.init();
+    if (!this.ctx) return;
+    this._playTone(220, 0.2, 'sawtooth', 0.16, 180);
+    setTimeout(() => {
+      this._playTone(246.94, 0.2, 'sawtooth', 0.18, 196);
+    }, 180);
+    setTimeout(() => {
+      this._playTone(330, 0.45, 'sawtooth', 0.22, 220);
+    }, 360);
+  }
+
+  // Daño a la ardilla malévola (golpe cómico y chillido)
+  bossHit() {
+    this._playTone(380, 0.18, 'triangle', 0.22, 160);
+    setTimeout(() => {
+      this._playTone(620, 0.12, 'sine', 0.15, 880);
+    }, 40);
+  }
+
+  // Lanzamiento de bellota por la ardilla
+  bossThrow() {
+    this._playTone(320, 0.15, 'sine', 0.14, 180);
+  }
+
+  // Rayo de corazón disparado por el gatito
+  heartBeam() {
+    this._playTone(720, 0.16, 'triangle', 0.18, 1250);
+  }
+
+  // Gran fanfarria de victoria total contra el jefe
+  bossDefeatFanfare() {
+    if (this.muted) return;
+    this.init();
+    if (!this.ctx) return;
+    const triumphant = [
+      { f: 523.25, d: 0.14 }, // C5
+      { f: 659.25, d: 0.14 }, // E5
+      { f: 783.99, d: 0.16 }, // G5
+      { f: 1046.50, d: 0.22 }, // C6
+      { f: 880.00, d: 0.18 }, // A5
+      { f: 1046.50, d: 0.2 },  // C6
+      { f: 1318.51, d: 0.55 }  // E6
+    ];
+    let offset = 0;
+    triumphant.forEach(n => {
+      setTimeout(() => {
+        this._playTone(n.f, n.d, 'triangle', 0.22);
+      }, offset);
+      offset += n.d * 750;
+    });
+  }
 }
 
 // Instancia global

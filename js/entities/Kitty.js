@@ -25,6 +25,9 @@ class Kitty {
     this.heartReaction = 0; // tiempo de corazoncito flotando sobre la cabeza
     this.jumpDelayTimer = 0; // ligero retardo para un salto natural y juguetón
     this.pendingJump = false;
+
+    // Rayos de corazón para la batalla contra la ardilla
+    this.heartBeams = [];
   }
 
   reset() {
@@ -39,6 +42,25 @@ class Kitty {
     this.heartReaction = 0;
     this.jumpDelayTimer = 0;
     this.pendingJump = false;
+    this.heartBeams = [];
+  }
+
+  fireHeartBeam(targetBoss, sound, particles) {
+    if (!targetBoss) return;
+    this.heartReaction = 50;
+    this.scaleY = 1.35;
+    this.scaleX = 0.8;
+    if (sound) sound.heartBeam();
+    this.heartBeams.push({
+      x: this.x + 20,
+      y: this.y - 18,
+      target: targetBoss,
+      speed: 12,
+      life: 60
+    });
+    if (particles) {
+      particles.sparkle(this.x + 20, this.y - 18, 6, '#ff4757');
+    }
   }
 
   onBunnyCollect() {
@@ -111,9 +133,49 @@ class Kitty {
     if (this.heartReaction > 0) {
       this.heartReaction--;
     }
+
+    // Actualizar rayos de corazón hacia el jefe
+    for (let i = this.heartBeams.length - 1; i >= 0; i--) {
+      const b = this.heartBeams[i];
+      b.life--;
+      const targetX = b.target.x;
+      const targetY = b.target.y;
+      const dx = targetX - b.x;
+      const dy = targetY - b.y;
+      const dist = Math.hypot(dx, dy);
+
+      if (dist < 34 || b.life <= 0) {
+        if (dist < 42 && b.target && b.target.takeDamage) {
+          b.target.takeDamage(1, particles, sound);
+        }
+        this.heartBeams.splice(i, 1);
+        continue;
+      }
+
+      b.x += (dx / dist) * b.speed;
+      b.y += (dy / dist) * b.speed;
+      if (particles && Math.random() > 0.35) {
+        particles.sparkle(b.x, b.y, 2, '#ff6b81');
+      }
+    }
   }
 
   draw(ctx) {
+    // Dibujar proyectiles de rayo de corazón del gatito
+    for (const b of this.heartBeams) {
+      ctx.save();
+      ctx.translate(b.x, b.y);
+      ctx.fillStyle = '#ff4757';
+      ctx.shadowColor = '#ff6b81';
+      ctx.shadowBlur = 12;
+      ctx.beginPath();
+      ctx.moveTo(0, 3);
+      ctx.bezierCurveTo(-6, -6, -13, 1, 0, 12);
+      ctx.bezierCurveTo(13, 1, 6, -6, 0, 3);
+      ctx.fill();
+      ctx.restore();
+    }
+
     ctx.save();
     ctx.translate(this.x, this.y);
     ctx.scale(this.scaleX, this.scaleY);

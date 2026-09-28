@@ -6,6 +6,10 @@ const CONFIG = {
   // Puntuación objetivo para desbloquear la carta
   TARGET_SCORE: 1914,
 
+  // Puntuación para la épica batalla contra la Ardilla Malévola
+  BOSS_SCORE: 2809,
+  BOSS_MAX_HP: 6,
+
   // Clave secreta para desbloquear la carta
   SECRET_KEY: "GATONUBE",
 

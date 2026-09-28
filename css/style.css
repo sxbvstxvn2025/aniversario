@@ -321,3 +321,282 @@ body {
   color: var(--rose-deep);
   font-weight: 600;
 }
+
+/* ============================================================
+   BOTÓN PARA CONTINUAR LA AVENTURA TRAS LA CARTA
+   ============================================================ */
+.continue-wrap {
+  text-align: center;
+  margin-top: 36px;
+  padding-top: 24px;
+  border-top: 2px dashed rgba(201, 111, 74, 0.28);
+}
+
+.continue-game-btn {
+  font-family: var(--font-ui);
+  font-size: clamp(1.65rem, 4.4vw, 1.95rem);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  padding: 13px 40px;
+  border: none;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #ea580c, #c2410c);
+  color: #fffaf0;
+  cursor: pointer;
+  box-shadow: 0 8px 24px rgba(234, 88, 12, 0.38);
+  transition: transform 0.2s ease, box-shadow 0.25s ease;
+}
+
+.continue-game-btn:hover {
+  transform: scale(1.05) translateY(-2px);
+  box-shadow: 0 12px 30px rgba(234, 88, 12, 0.48);
+}
+
+.continue-game-btn:active {
+  transform: scale(0.97);
+}
+
+.continue-hint {
+  font-family: var(--font-ui);
+  font-size: clamp(1.3rem, 3.2vw, 1.45rem);
+  color: var(--terracota);
+  margin-top: 10px;
+  opacity: 0.95;
+}
+
+/* ============================================================
+   ALERTA DE JEFE FINAL (ARDILLA MALÉVOLA)
+   ============================================================ */
+.boss-warning {
+  position: fixed;
+  top: 16%;
+  left: 50%;
+  transform: translateX(-50%) scale(0.85);
+  z-index: 50;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.4s ease, transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+  width: min(92vw, 560px);
+  text-align: center;
+}
+
+.boss-warning.show {
+  opacity: 1;
+  transform: translateX(-50%) scale(1);
+}
+
+.boss-warning-box {
+  background: rgba(15, 23, 42, 0.92);
+  border: 3px solid #f59e0b;
+  border-radius: 20px;
+  padding: 22px 24px;
+  box-shadow: 0 0 35px rgba(245, 158, 11, 0.5), 0 20px 50px rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(10px);
+  animation: warningPulse 1s ease-in-out infinite alternate;
+}
+
+@keyframes warningPulse {
+  0% { box-shadow: 0 0 25px rgba(245, 158, 11, 0.4); }
+  100% { box-shadow: 0 0 50px rgba(239, 68, 68, 0.8); }
+}
+
+.boss-warning .warning-icon {
+  font-size: 2.5rem;
+  margin-bottom: 6px;
+}
+
+.boss-warning h2 {
+  font-family: var(--font-ui);
+  font-size: clamp(2rem, 5vw, 2.6rem);
+  color: #fef08a;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  margin-bottom: 6px;
+}
+
+.boss-warning p {
+  font-family: var(--font-ui);
+  font-size: clamp(1.4rem, 3.6vw, 1.7rem);
+  color: #fecdd3;
+  line-height: 1.35;
+}
+
+/* ============================================================
+   HUD DEL JEFE FINAL (BARRA DE VIDAS)
+   ============================================================ */
+.boss-hud {
+  position: fixed;
+  top: 18px;
+  right: 24px;
+  z-index: 25;
+  opacity: 0;
+  transform: translateY(-20px);
+  pointer-events: none;
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+.boss-hud.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.boss-hud-inner {
+  background: rgba(24, 18, 36, 0.88);
+  backdrop-filter: blur(8px);
+  padding: 8px 18px;
+  border-radius: 999px;
+  border: 2px solid rgba(245, 158, 11, 0.5);
+  box-shadow: 0 6px 25px rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.boss-name {
+  font-family: var(--font-ui);
+  font-size: 1.45rem;
+  font-weight: 700;
+  color: #fcd34d;
+  letter-spacing: 0.04em;
+}
+
+.boss-hp-bar {
+  display: flex;
+  gap: 4px;
+}
+
+.boss-hp-dot {
+  font-size: 1.5rem;
+  transition: transform 0.2s ease, opacity 0.3s ease;
+}
+
+.boss-hp-dot.lost {
+  opacity: 0.3;
+  filter: grayscale(1);
+  transform: scale(0.75);
+}
+
+@media (max-width: 680px) {
+  .boss-hud {
+    right: 50%;
+    transform: translateX(50%) translateY(-20px);
+    top: 68px;
+  }
+  .boss-hud.show {
+    transform: translateX(50%) translateY(0);
+  }
+}
+
+/* ============================================================
+   PANTALLA DE VICTORIA TOTAL
+   ============================================================ */
+.victory-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(10, 15, 30, 0.82);
+  backdrop-filter: blur(8px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.8s ease;
+}
+
+.victory-modal.show {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.victory-card {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0) 35%),
+    var(--paper);
+  border-radius: 24px;
+  box-shadow: 0 25px 80px rgba(0, 0, 0, 0.5);
+  padding: clamp(28px, 6vw, 44px);
+  max-width: 580px;
+  width: 100%;
+  text-align: center;
+  border: 3px solid rgba(245, 158, 11, 0.4);
+  transform: translateY(20px) scale(0.95);
+  transition: transform 0.8s cubic-bezier(0.2, 0.9, 0.3, 1.2);
+}
+
+.victory-modal.show .victory-card {
+  transform: translateY(0) scale(1);
+}
+
+.victory-trophy {
+  font-size: clamp(2.8rem, 7vw, 4.2rem);
+  animation: bob 1.8s ease-in-out infinite;
+  margin-bottom: 8px;
+}
+
+.victory-card h2 {
+  font-family: var(--font-ui);
+  font-size: clamp(2.2rem, 5.8vw, 3rem);
+  color: var(--terracota);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  margin-bottom: 12px;
+}
+
+.victory-lead {
+  font-family: var(--font-ui);
+  font-size: clamp(1.75rem, 4.4vw, 2.15rem);
+  color: var(--ink);
+  font-weight: 600;
+  margin-bottom: 8px;
+  line-height: 1.4;
+}
+
+.victory-sub {
+  font-family: var(--font-ui);
+  font-size: clamp(1.5rem, 3.8vw, 1.85rem);
+  color: #78350f;
+  margin-bottom: 16px;
+  line-height: 1.4;
+}
+
+.victory-badge {
+  display: inline-block;
+  background: linear-gradient(135deg, #fef3c7, #fde68a);
+  color: #92400e;
+  border: 2px solid #f59e0b;
+  border-radius: 999px;
+  padding: 8px 24px;
+  font-family: var(--font-ui);
+  font-size: clamp(1.5rem, 3.8vw, 1.85rem);
+  font-weight: 700;
+  margin: 12px 0 24px;
+  box-shadow: 0 4px 14px rgba(245, 158, 11, 0.25);
+}
+
+.victory-restart-btn {
+  display: block;
+  margin: 0 auto;
+  font-family: var(--font-ui);
+  font-size: clamp(1.7rem, 4.2vw, 2rem);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  padding: 12px 38px;
+  border: none;
+  border-radius: 999px;
+  background: linear-gradient(135deg, var(--terracota), var(--rose-deep));
+  color: #ffffff;
+  cursor: pointer;
+  box-shadow: 0 8px 25px rgba(201, 111, 74, 0.4);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.victory-restart-btn:hover {
+  transform: scale(1.05) translateY(-2px);
+  box-shadow: 0 12px 30px rgba(201, 111, 74, 0.5);
+}
+
+.victory-restart-btn:active {
+  transform: scale(0.97);
+}

@@ -69,6 +69,28 @@ class ParticleSystem {
     }
   }
 
+  // Explosión de confeti para victorias y momentos épicos
+  confettiBurst(x, y, n = 40) {
+    const colors = ['#ff5c77', '#fcd34d', '#4ade80', '#60a5fa', '#c084fc', '#f472b6', '#ffffff', '#fb923c'];
+    for (let i = 0; i < n; i++) {
+      const angle = Math.random() * Math.PI * 2;
+      const speed = 2.5 + Math.random() * 6;
+      this.particles.push({
+        type: 'confetti',
+        x, y,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed - 3,
+        w: 6 + Math.random() * 4,
+        h: 3 + Math.random() * 3,
+        rot: Math.random() * Math.PI,
+        vRot: (Math.random() - 0.5) * 0.22,
+        life: 1,
+        decay: 0.012 + Math.random() * 0.012,
+        color: colors[Math.floor(Math.random() * colors.length)]
+      });
+    }
+  }
+
   // Texto flotante de puntos o combo ("+25", "♥ x3!", etc.)
   addFloatingText(text, x, y, color = '#b85c48', size = 26) {
     this.floatingTexts.push({
@@ -94,6 +116,9 @@ class ParticleSystem {
       } else if (p.type === 'heart') {
         p.vy += 0.02;
         p.vx += Math.sin(p.life * 10) * 0.15;
+      } else if (p.type === 'confetti') {
+        p.vy += 0.1;
+        p.vx *= 0.98;
       }
       if (p.rot !== undefined) p.rot += p.vRot;
       p.life -= p.decay;
@@ -151,6 +176,13 @@ class ParticleSystem {
         ctx.bezierCurveTo(-5, -6, -11, 2, 0, 11);
         ctx.bezierCurveTo(11, 2, 5, -6, 0, 3);
         ctx.fill();
+        ctx.restore();
+      } else if (p.type === 'confetti') {
+        ctx.save();
+        ctx.translate(p.x, p.y);
+        ctx.rotate(p.rot);
+        ctx.fillStyle = p.color;
+        ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
         ctx.restore();
       }
     }

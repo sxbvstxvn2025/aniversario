@@ -15,8 +15,16 @@ class UIManager {
     this.keyBtn = document.getElementById('key-submit');
     this.keyError = document.getElementById('key-error');
     this.letterSc = document.getElementById('letter-screen');
+    this.continueBtn = document.getElementById('continue-game-btn');
+    this.bossWarning = document.getElementById('boss-warning');
+    this.bossHud = document.getElementById('boss-hud');
+    this.bossHpBar = document.getElementById('boss-hp-bar');
+    this.victoryModal = document.getElementById('victory-modal');
+    this.victoryRestartBtn = document.getElementById('victory-restart-btn');
 
     this.onKeySuccessCallback = null;
+    this.onContinueGameCallback = null;
+    this.onVictoryRestartCallback = null;
     this._bindEvents();
     this.updateMuteIcon();
     this.loadLoveLetterFromTxt();
@@ -112,6 +120,26 @@ class UIManager {
         if (e.key === 'Enter') this.submitKey();
       });
     }
+
+    if (this.continueBtn) {
+      this.continueBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        this.hideLetterScreen();
+        if (this.onContinueGameCallback) {
+          this.onContinueGameCallback();
+        }
+      });
+    }
+
+    if (this.victoryRestartBtn) {
+      this.victoryRestartBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        this.hideVictoryModal();
+        if (this.onVictoryRestartCallback) {
+          this.onVictoryRestartCallback();
+        }
+      });
+    }
   }
 
   updateMuteIcon() {
@@ -150,6 +178,62 @@ class UIManager {
   unfreezeWrap() {
     this.wrap.classList.remove('frozen');
     this.wrap.style.opacity = '1';
+  }
+
+  showGameHud() {
+    if (this.hudWrap) {
+      this.hudWrap.style.opacity = '1';
+    }
+  }
+
+  hideLetterScreen() {
+    if (this.letterSc) {
+      this.letterSc.classList.remove('show');
+    }
+  }
+
+  showBossWarning() {
+    if (!this.bossWarning) return;
+    this.bossWarning.classList.add('show');
+    setTimeout(() => {
+      this.bossWarning.classList.remove('show');
+    }, 2800);
+  }
+
+  showBossHud(hp, maxHp) {
+    if (!this.bossHud) return;
+    this.bossHud.classList.add('show');
+    this.updateBossHp(hp, maxHp);
+  }
+
+  updateBossHp(hp, maxHp) {
+    if (!this.bossHpBar) return;
+    this.bossHpBar.innerHTML = '';
+    for (let i = 0; i < maxHp; i++) {
+      const dot = document.createElement('span');
+      dot.className = 'boss-hp-dot ' + (i < hp ? 'active' : 'lost');
+      dot.textContent = i < hp ? '🌰' : '💨';
+      this.bossHpBar.appendChild(dot);
+    }
+  }
+
+  hideBossHud() {
+    if (this.bossHud) {
+      this.bossHud.classList.remove('show');
+    }
+  }
+
+  showVictoryModal(finalScore) {
+    this.hideBossHud();
+    if (this.victoryModal) {
+      this.victoryModal.classList.add('show');
+    }
+  }
+
+  hideVictoryModal() {
+    if (this.victoryModal) {
+      this.victoryModal.classList.remove('show');
+    }
   }
 
   showKeyModal() {
