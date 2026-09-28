@@ -107,6 +107,7 @@ class Game {
     this.hasUnlockedLetter = false;
     this.continuingAfterLetter = false;
     this.screenShake = 0;
+    this.graceFrames = 0;
 
     this.obstacles = [];
     this.collectibles = [];
@@ -118,6 +119,7 @@ class Game {
     this.ui.hideStartScreen();
     this.ui.hideBossHud();
     this.ui.hideVictoryModal();
+    this.ui.hideGraceBanner();
     this.ui.unfreezeWrap();
 
     if (this.sound) this.sound.init();
@@ -130,11 +132,18 @@ class Game {
     this.frozen = false;
     this.running = true;
 
+    // Despejar cualquier obstáculo para dar exactamente 5 segundos limpios
+    this.obstacles = [];
+    this.graceFrames = 300; // 5 segundos enteros a 60 FPS
+    this.nextSpawn = 360;   // Retrasar el primer obstáculo después de los 5 segundos
+
     this.ui.unfreezeWrap();
     this.ui.showGameHud();
+    this.ui.showGraceBanner('¡AGARRA LA ONDA! 5s sin obstáculos 💨');
+
     if (this.sound) this.sound.bounce();
     this.particles.confettiBurst(this.bunny.x, this.bunny.y - 20, 30);
-    this.particles.addFloatingText('¡A POR LA ARDILLA! ⚔️🐿️', this.bunny.x, this.bunny.y - 45, '#fcd34d', 28);
+    this.particles.addFloatingText('¡5s PARA AGARRAR LA ONDA! 🛡️✨', this.bunny.x, this.bunny.y - 45, '#fcd34d', 28);
   }
 
   triggerBossFight() {
@@ -195,6 +204,27 @@ class Game {
     this.bunny.update(this.speed, this.particles, this.sound);
     this.kitty.update(this.bunny, this.speed, this.particles, this.sound);
 
+    // 6.5 Manejo del período de gracia (5 segundos sin obstáculos para que el jugador agarre la onda)
+    if (this.graceFrames > 0) {
+      this.graceFrames--;
+      const secsLeft = Math.ceil(this.graceFrames / 60);
+
+      // Actualizar texto cada segundo (5, 4, 3, 2, 1)
+      if (this.graceFrames % 60 === 0 && secsLeft > 0) {
+        this.ui.updateGraceBanner(`¡AGARRA LA ONDA! ${secsLeft}s sin obstáculos 💨`);
+      }
+
+      // Spawning de coleccionables amigables para practicar saltos
+      if (this.graceFrames === 220 || this.graceFrames === 120) {
+        this.collectibles.push(new window.Collectible(this.W + 20, this.groundY - 105, 'star'));
+      }
+
+      if (this.graceFrames === 0) {
+        this.ui.updateGraceBanner('¡A DARLE CON TODO! 🚀🔥');
+        setTimeout(() => this.ui.hideGraceBanner(), 1200);
+      }
+    }
+
     // 7. Actualizar obstáculos
     for (const ob of this.obstacles) {
       ob.update(this.speed);
@@ -224,8 +254,8 @@ class Game {
 
     if (this.screenShake > 0) this.screenShake--;
 
-    // 9. Spawn dinámico de patrones divertidos (pausado durante la batalla de jefe)
-    if (!this.bossActive) {
+    // 9. Spawn dinámico de patrones divertidos (pausado durante la batalla de jefe y período de gracia)
+    if (!this.bossActive && this.graceFrames <= 0) {
       this.nextSpawn -= this.speed;
       if (this.nextSpawn <= 0) {
         this.spawnPattern();
@@ -244,7 +274,7 @@ class Game {
   }
 
   spawnPattern() {
-    if (this.bossActive) return;
+    if (this.bossActive || this.graceFrames > 0) return;
 
     // Tipos de patrones aleatorios para gameplay entretenido
     const patternType = Math.floor(Math.random() * 5);
@@ -355,6 +385,7 @@ class Game {
       }
 
       // Colisión normal (tropiezo)
+      if (this.graceFrames > 0) continue; // Inmune a obstáculos durante los 5 segundos de gracia
       if (
         bHit.x < oHit.x + oHit.w &&
         bHit.x + bHit.w > oHit.x &&

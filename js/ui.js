@@ -21,6 +21,8 @@ class UIManager {
     this.bossHpBar = document.getElementById('boss-hp-bar');
     this.victoryModal = document.getElementById('victory-modal');
     this.victoryRestartBtn = document.getElementById('victory-restart-btn');
+    this.graceBanner = document.getElementById('grace-banner');
+    this.graceText = document.getElementById('grace-text');
 
     this.onKeySuccessCallback = null;
     this.onContinueGameCallback = null;
@@ -192,12 +194,27 @@ class UIManager {
     }
   }
 
+  showGraceBanner(text) {
+    if (!this.graceBanner) return;
+    if (this.graceText && text) this.graceText.textContent = text;
+    this.graceBanner.classList.add('show');
+  }
+
+  updateGraceBanner(text) {
+    if (this.graceText && text) this.graceText.textContent = text;
+  }
+
+  hideGraceBanner() {
+    if (!this.graceBanner) return;
+    this.graceBanner.classList.remove('show');
+  }
+
   showBossWarning() {
     if (!this.bossWarning) return;
     this.bossWarning.classList.add('show');
     setTimeout(() => {
       this.bossWarning.classList.remove('show');
-    }, 2800);
+    }, 4500);
   }
 
   showBossHud(hp, maxHp) {

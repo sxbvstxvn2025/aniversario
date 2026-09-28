@@ -141,7 +141,7 @@ class SquirrelBoss {
         if (Math.abs(this.x - this.hoverX) < 8) {
           this.x = this.hoverX;
           this.state = 'HOVER';
-          this.attackCooldown = 80;
+          this.attackCooldown = 300; // 5 segundos sin ataques para que el jugador agarre la onda
           if (particles) {
             particles.addFloatingText('¡JAJAJA! 🐿️😈', this.x, this.y - 35, '#e74c3c', 30);
           }
