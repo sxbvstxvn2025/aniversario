@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>For You 🐰🐱</title>
+  <title>Los Babys: EL JUEGO 🐰🐱</title>
 
   <!-- Tipografías: Caveat + Cormorant Garamond -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -30,7 +30,7 @@
   <div id="hud">
     <span class="heart">♥</span>
     <span id="score">0</span>
-    <button id="mute-btn" title="Mute / Unmute audio">🔊</button>
+    <button id="mute-btn" title="Silenciar / Activar sonido">🔊</button>
   </div>
 
   <!-- Escenario del juego -->
@@ -44,29 +44,29 @@
     <h1>Los Babys: EL JUEGO</h1>
     <p>Corre con yuyi y bebi, salta y lo que sea que gemini haya hecho!!!!</p>
     <div class="controls-hint">
-      <span>✨ Jump: Space / Tap</span>
-      <span>☁️ Double jump in mid-air</span>
+      <span>✨ Saltar: Espacio / Toca la pantalla</span>
+      <span>☁️ Doble salto en el aire</span>
     </div>
-    <div class="hint">tap the screen / press space to start</div>
+    <div class="hint">toca la pantalla o presiona espacio para empezar :V</div>
   </div>
 
   <!-- Overlay de la clave secreta con Gato Nube -->
   <div id="overlay">
     <div id="key-modal">
       <img src="gatonube.webp" alt="Gato Nube" class="modal-gatonube-img">
-      <h2>TYPE HIS NAME TO UNLOCK SOMETHING COOL!!!! (ALL CAPS, NO SPACES)</h2>
-      <p class="key-ps-note">PS. 1914 IS YOUR SCORE, FUNNY NUMBER, RIGHT!???</p>
-      <input id="key-input" type="text" inputmode="text" autocomplete="off" placeholder="NAME HERE..." aria-label="secret name">
+      <h2>ESCRIBE SU NOMBRE PARA DESBLOQUEAR ALGO CHIDO!!!! (EN MAYÚSCULAS Y SIN ESPACIOS)</h2>
+      <p class="key-ps-note">PD. 1914 ES TU PUNTUACIÓN, NÚMERO CURIOSO, NO!???</p>
+      <input id="key-input" type="text" inputmode="text" autocomplete="off" placeholder="NOMBRE AQUÍ..." aria-label="nombre secreto">
       <br>
-      <button id="key-submit">UNLOCK ✨</button>
-      <div id="key-error">Oops... that's not his name! Try again 🐱☁️</div>
+      <button id="key-submit">DESBLOQUEAR ✨</button>
+      <div id="key-error">Ups... ese no es su nombre! Intenta de nuevo 🐱☁️</div>
     </div>
   </div>
 
   <!-- Carta romántica -->
   <div id="letter-screen">
     <div class="letter">
-      <div class="titulo-carta" id="letter-title">For the love of my life</div>
+      <div class="titulo-carta" id="letter-title">Para el amor de mi vida</div>
       <img src="gatonube.webp" alt="Gatito" class="letter-kitten-img">
       <div class="saludo" id="letter-greeting">Hola [Nombre]</div>
       <div class="cuerpo" id="letter-body">No es cierto, mi Yurihermosa, ya cuatro años de relación! Se dice mucho pero para mi se han pasado muy rapido

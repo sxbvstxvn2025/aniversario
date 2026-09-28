@@ -118,7 +118,7 @@ class UIManager {
     if (!this.muteBtn) return;
     const isMuted = window.sound.isMuted();
     this.muteBtn.innerHTML = isMuted ? '🔇' : '🔊';
-    this.muteBtn.setAttribute('title', isMuted ? 'Unmute audio' : 'Mute audio');
+    this.muteBtn.setAttribute('title', isMuted ? 'Activar sonido' : 'Silenciar sonido');
   }
 
   updateScore(score) {

@@ -239,7 +239,7 @@ class Game {
         // Texto flotante
         this.particles.addFloatingText(`+${earned}`, col.x, col.y - 12);
         if (this.combo > 1) {
-          const praises = ['♥ x' + this.combo, 'Cute! ♥', 'I love you! ✨', 'Amazing! 💕', 'So sweet! 🌸'];
+          const praises = ['♥ x' + this.combo, 'Esooo! ♥', 'Te amo! ✨', 'Puntazos! 💕', 'Qué pro! :V', 'Chulada! 🌸'];
           const text = praises[Math.min(this.combo - 2, praises.length - 1)];
           this.particles.addFloatingText(text, col.x, col.y - 32, '#d97f7f', 28);
         }
