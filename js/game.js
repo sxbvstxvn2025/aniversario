@@ -110,6 +110,7 @@ class Game {
     this.graceFrames = 0;
     this.bunnyLives = 3;
     this.kittySupportTimer = 0;
+    this.feverTimer = 0;
 
     this.obstacles = [];
     this.collectibles = [];
@@ -125,6 +126,14 @@ class Game {
     this.ui.unfreezeWrap();
 
     if (this.sound) this.sound.init();
+  }
+
+  activateFever(duration = 320) {
+    this.feverTimer = duration;
+    if (this.sound) this.sound.powerUp();
+    this.screenShake = 8;
+    this.particles.confettiBurst(this.bunny.x, this.bunny.y - 20, 30);
+    this.particles.addFloatingText('¡MODO BABYS! 🌈✨', this.bunny.x, this.bunny.y - 45, '#ec4899', 30);
   }
 
   continueAfterLetter() {
@@ -172,15 +181,16 @@ class Game {
   }
 
   update() {
-    // 1. Progresión suave de velocidad
-    const progress = Math.min(1, this.score / CONFIG.TARGET_SCORE);
-    this.speed = Math.min(
-      CONFIG.SPEED_MAX,
-      CONFIG.SPEED_START + progress * (CONFIG.SPEED_MAX - CONFIG.SPEED_START)
-    );
+    // 1. Progresión suave y dinámica de velocidad
+    const targetMax = this.bossActive ? (CONFIG.BOSS_SCORE || 2809) : CONFIG.TARGET_SCORE;
+    const progress = Math.min(1, this.score / targetMax);
+    let baseSpeed = CONFIG.SPEED_START + progress * (CONFIG.SPEED_MAX - CONFIG.SPEED_START);
+    if (this.feverTimer > 0) baseSpeed *= 1.15; // Velocidad alegre durante Modo Babys
+    this.speed = Math.min(CONFIG.SPEED_MAX * 1.25, baseSpeed);
 
     // 2. Acumulación de puntuación continua por distancia recorrida
-    this.score += CONFIG.PTS_PER_SEC / 60;
+    const ptsRate = (this.feverTimer > 0 ? CONFIG.PTS_PER_SEC * 1.5 : CONFIG.PTS_PER_SEC) / 60;
+    this.score += ptsRate;
     this.ui.updateScore(Math.floor(this.score));
 
     // 3. Temporizador de combo
@@ -208,6 +218,27 @@ class Game {
     // 6. Actualizar jugador (conejito) y compañero (gatito)
     this.bunny.update(this.speed, this.particles, this.sound);
     this.kitty.update(this.bunny, this.speed, this.particles, this.sound);
+
+    // 6.2 Manejo del MODO BABYS (Fever Mode / Imán de Amor)
+    if (this.feverTimer > 0) {
+      this.feverTimer--;
+      // Estela arcoíris
+      const hue = (Date.now() / 6) % 360;
+      this.particles.sparkle(this.bunny.x - 22, this.bunny.y - 15, 2, `hsl(${hue}, 95%, 65%)`);
+      this.particles.sparkle(this.kitty.x - 18, this.kitty.y - 12, 1, `hsl(${(hue + 60) % 360}, 95%, 65%)`);
+
+      // Imán de amor: acerca coleccionables suavemente
+      for (const col of this.collectibles) {
+        if (col.collected) continue;
+        const dx = this.bunny.x - col.x;
+        const dy = (this.bunny.y - 20) - col.y;
+        const dist = Math.hypot(dx, dy);
+        if (dist < 230) {
+          col.x += (dx / dist) * 8.5;
+          col.y += (dy / dist) * 8.5;
+        }
+      }
+    }
 
     // 6.5 Manejo del período de gracia (5 segundos sin obstáculos para que el jugador agarre la onda)
     if (this.graceFrames > 0) {
@@ -246,21 +277,6 @@ class Game {
     if (this.bossActive && this.boss) {
       this.boss.update(this.bunny, this.kitty, this.particles, this.sound, this.collectibles);
 
-      // Disparo de apoyo de Kitty si pasan ~4 segundos sin disparar por coleccionables
-      if (!this.boss.isDefeated) {
-        this.kittySupportTimer = (this.kittySupportTimer || 0) + 1;
-        if (this.kittySupportTimer >= 220) {
-          this.kittySupportTimer = 0;
-          this.kitty.fireHeartBeam(this.boss, this.sound, this.particles, (hitBoss) => {
-            if (hitBoss) {
-              this.ui.updateBossHp(hitBoss.hp, hitBoss.maxHp);
-              this.screenShake = 10;
-            }
-          });
-          this.particles.addFloatingText('¡APOYO GATUNO! 🐾💖', this.kitty.x, this.kitty.y - 30, '#ff4757', 24);
-        }
-      }
-
       // Revisar si el jefe terminó su animación de derrota
       if (this.boss.isDefeated && !this.bossDefeated) {
         if (this.boss.defeatTimer <= 30) {
@@ -296,34 +312,81 @@ class Game {
   spawnPattern() {
     if (this.bossActive || this.graceFrames > 0) return;
 
-    // Tipos de patrones aleatorios para gameplay entretenido
-    const patternType = Math.floor(Math.random() * 5);
+    // 8 Patrones dinámicos y emocionantes para un gameplay super divertido y variado
+    const patternType = Math.floor(Math.random() * 8);
     const spawnX = this.W + 40;
 
-    const OB_TYPES = ['carrot', 'flower', 'bush', 'sleeping_snail', 'bounce_mushroom'];
-    const chosenType = OB_TYPES[Math.floor(Math.random() * OB_TYPES.length)];
+    switch (patternType) {
+      case 0: {
+        // PATRÓN 0: El Trampolín Celestial (Hongo elástico + estrellas + caracol dormilón)
+        this.obstacles.push(new window.Obstacle(spawnX, this.groundY, 'bounce_mushroom'));
+        this.collectibles.push(new window.Collectible(spawnX + 35, this.groundY - 140, 'star'));
+        this.collectibles.push(new window.Collectible(spawnX + 75, this.groundY - 170, 'golden_carrot'));
+        this.collectibles.push(new window.Collectible(spawnX + 115, this.groundY - 140, 'star'));
+        this.obstacles.push(new window.Obstacle(spawnX + 110, this.groundY, 'sleeping_snail'));
+        break;
+      }
 
-    const obstacle = new window.Obstacle(spawnX, this.groundY, chosenType);
-    this.obstacles.push(obstacle);
+      case 1: {
+        // PATRÓN 1: El Desafío del Doble Salto (Flor + Zanahoria a corta distancia)
+        this.obstacles.push(new window.Obstacle(spawnX, this.groundY, 'flower'));
+        this.obstacles.push(new window.Obstacle(spawnX + 85, this.groundY, 'carrot'));
+        this.collectibles.push(new window.Collectible(spawnX + 40, this.groundY - 95, 'heart'));
+        this.collectibles.push(new window.Collectible(spawnX + 85, this.groundY - 110, 'heart'));
+        break;
+      }
 
-    // Crear coleccionables según el contexto
-    if (chosenType === 'bounce_mushroom') {
-      // Si hay un hongo elástico, ponemos una constelación de estrellas altas en el cielo
-      this.collectibles.push(new window.Collectible(spawnX + 40, this.groundY - 145, 'star'));
-      this.collectibles.push(new window.Collectible(spawnX + 85, this.groundY - 170, 'star'));
-      this.collectibles.push(new window.Collectible(spawnX + 130, this.groundY - 145, 'star'));
-    } else if (patternType === 1) {
-      // Arco de 3 corazones sobre el obstáculo
-      this.collectibles.push(new window.Collectible(spawnX - 35, this.groundY - 60, 'heart'));
-      this.collectibles.push(new window.Collectible(spawnX, this.groundY - 95, 'heart'));
-      this.collectibles.push(new window.Collectible(spawnX + 35, this.groundY - 60, 'heart'));
-    } else if (patternType === 2) {
-      // Una fresita dulce flotante que requiere salto
-      this.collectibles.push(new window.Collectible(spawnX + 120, this.groundY - 80, 'strawberry'));
-    } else {
-      // Corazoncito tentador
-      if (Math.random() > 0.35) {
-        this.collectibles.push(new window.Collectible(spawnX + 60, this.groundY - 55, 'heart'));
+      case 2: {
+        // PATRÓN 2: Castaña Rodante Rápida con recompensa aérea
+        this.obstacles.push(new window.Obstacle(spawnX, this.groundY, 'rolling_chestnut'));
+        const rewardType = Math.random() > 0.55 ? 'bubble_shield' : 'strawberry';
+        this.collectibles.push(new window.Collectible(spawnX + 60, this.groundY - 85, rewardType));
+        break;
+      }
+
+      case 3: {
+        // PATRÓN 3: El Vuelo de la Mariposa (Obstáculo aéreo con corazón tentador)
+        this.obstacles.push(new window.Obstacle(spawnX, this.groundY, 'flying_butterfly'));
+        if (Math.random() > 0.35) {
+          this.collectibles.push(new window.Collectible(spawnX + 15, this.groundY - 25, 'heart'));
+        }
+        break;
+      }
+
+      case 4: {
+        // PATRÓN 4: La Racha de Amor (Arbusto + Estrella Arcoíris de Modo Babys)
+        this.obstacles.push(new window.Obstacle(spawnX, this.groundY, 'bush'));
+        this.collectibles.push(new window.Collectible(spawnX - 25, this.groundY - 55, 'heart'));
+        this.collectibles.push(new window.Collectible(spawnX + 45, this.groundY - 95, 'rainbow_star'));
+        this.collectibles.push(new window.Collectible(spawnX + 115, this.groundY - 55, 'heart'));
+        break;
+      }
+
+      case 5: {
+        // PATRÓN 5: Trampolín con Escudo Burbuja
+        this.obstacles.push(new window.Obstacle(spawnX, this.groundY, 'bounce_mushroom'));
+        this.collectibles.push(new window.Collectible(spawnX + 50, this.groundY - 150, 'bubble_shield'));
+        this.collectibles.push(new window.Collectible(spawnX + 90, this.groundY - 130, 'star'));
+        break;
+      }
+
+      case 6: {
+        // PATRÓN 6: Castaña rodante + Mariposa en juego sincronizado
+        this.obstacles.push(new window.Obstacle(spawnX, this.groundY, 'rolling_chestnut'));
+        this.obstacles.push(new window.Obstacle(spawnX + 125, this.groundY, 'flying_butterfly'));
+        this.collectibles.push(new window.Collectible(spawnX + 60, this.groundY - 80, 'golden_carrot'));
+        break;
+      }
+
+      default: {
+        // PATRÓN 7: Obstáculo clásico variado con regalito dulce
+        const OB_TYPES = ['carrot', 'flower', 'bush', 'sleeping_snail'];
+        const chosen = OB_TYPES[Math.floor(Math.random() * OB_TYPES.length)];
+        this.obstacles.push(new window.Obstacle(spawnX, this.groundY, chosen));
+        if (Math.random() > 0.3) {
+          this.collectibles.push(new window.Collectible(spawnX + 50, this.groundY - 60, 'heart'));
+        }
+        break;
       }
     }
   }
@@ -346,17 +409,37 @@ class Game {
         this.combo++;
         this.comboTimer = 180; // 3 segundos para mantener combo
 
-        const comboMultiplier = 1 + Math.min(this.combo - 1, 5) * 0.25;
+        // Activar Modo Babys si se alcanzan combos altos
+        if (this.combo === 6 || this.combo === 12 || this.combo === 18) {
+          this.activateFever(260);
+        }
+
+        const feverMult = this.feverTimer > 0 ? 2.0 : 1.0;
+        const comboMultiplier = (1 + Math.min(this.combo - 1, 5) * 0.25) * feverMult;
         const earned = Math.round(col.points * comboMultiplier);
         this.score += earned;
 
-        // Feedback sonoro y visual
-        if (col.type === 'star') {
+        // Feedback sonoro y visual según tipo de coleccionable
+        if (col.type === 'golden_carrot') {
+          if (this.sound) this.sound.powerUp();
+          this.particles.confettiBurst(col.x, col.y, 25);
+          this.particles.addFloatingText('¡ZANAHORIA DE ORO! 🥕✨ +' + earned, col.x, col.y - 18, '#fbbf24', 28);
+        } else if (col.type === 'bubble_shield') {
+          this.bunny.hasShield = true;
+          if (this.sound) this.sound.collectStar();
+          this.particles.sparkle(col.x, col.y, 14, '#38bdf8');
+          this.particles.addFloatingText('¡ESCUDO BURBUJA! 🫧🛡️', col.x, col.y - 18, '#38bdf8', 28);
+        } else if (col.type === 'rainbow_star') {
+          this.activateFever(360);
+          this.particles.confettiBurst(col.x, col.y, 35);
+        } else if (col.type === 'star') {
           if (this.sound) this.sound.collectStar();
           this.particles.sparkle(col.x, col.y, 10, '#fbe39d');
+          this.particles.addFloatingText(`+${earned}`, col.x, col.y - 12);
         } else {
           if (this.sound) this.sound.collect(this.combo);
           this.particles.heartBurst(col.x, col.y, 6);
+          this.particles.addFloatingText(`+${earned}`, col.x, col.y - 12);
         }
 
         // Avisar al gatito para que purree con corazoncitos
@@ -364,7 +447,6 @@ class Game {
 
         // Si la batalla de jefe está activa, el gatito dispara su Rayo Gatuno
         if (this.bossActive && this.boss && !this.boss.isDefeated) {
-          this.kittySupportTimer = 0;
           this.kitty.fireHeartBeam(this.boss, this.sound, this.particles, (hitBoss) => {
             if (hitBoss) {
               this.ui.updateBossHp(hitBoss.hp, hitBoss.maxHp);
@@ -374,8 +456,6 @@ class Game {
           this.particles.addFloatingText('¡RAYO GATUNO! 🐾💖', col.x, col.y - 48, '#ff4757', 26);
         }
 
-        // Texto flotante
-        this.particles.addFloatingText(`+${earned}`, col.x, col.y - 12);
         if (this.combo > 1) {
           const praises = ['♥ x' + this.combo, 'Esooo! ♥', 'Te amo! ✨', 'Puntazos! 💕', 'Qué pro! :V', 'Chulada! 🌸'];
           const text = praises[Math.min(this.combo - 2, praises.length - 1)];
@@ -418,6 +498,20 @@ class Game {
         bHit.y < oHit.y + oHit.h &&
         bHit.y + bHit.h > oHit.y
       ) {
+        // ¿Tiene escudo burbuja activo?
+        if (this.bunny.hasShield) {
+          this.bunny.hasShield = false;
+          this.bunny.invulnTimer = 75; // 1.25s de parpadeo seguro
+          this.screenShake = 10;
+          if (this.sound) this.sound.shieldPop();
+          this.particles.puff(this.bunny.x, this.bunny.y - 15, 16, '#38bdf8');
+          this.particles.sparkle(this.bunny.x, this.bunny.y - 15, 12, '#ec4899');
+          this.particles.addFloatingText('¡ESCUDO SALVADOR! 🫧💥', this.bunny.x, this.bunny.y - 35, '#38bdf8', 28);
+          // Eliminar el obstáculo chocado para seguir la carrera limpiamente
+          this.obstacles = this.obstacles.filter(o => o !== ob);
+          continue;
+        }
+
         this.gameOver();
         return;
       }

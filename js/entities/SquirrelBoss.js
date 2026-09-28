@@ -170,10 +170,10 @@ class SquirrelBoss {
           }
         }
 
-        // Generar estrellas y corazones constantemente para alimentar el rayo de Kitty
-        if (this.t % 85 === 0 && gameCollectibles) {
-          const cType = Math.random() > 0.4 ? 'star' : 'heart';
-          const cY = this.groundY - (60 + Math.random() * 50);
+        // Generar una estrella o corazón de forma medida (cada ~4.3s) para premiar saltos diestros
+        if (this.t % 260 === 0 && gameCollectibles) {
+          const cType = Math.random() > 0.5 ? 'star' : 'heart';
+          const cY = this.groundY - (80 + Math.random() * 35);
           gameCollectibles.push(new window.Collectible(this.W + 20, cY, cType));
           if (particles) {
             particles.sparkle(this.W, cY, 6, '#f1c40f');

@@ -13,11 +13,13 @@ class Obstacle {
 
     // Configuración según el tipo
     const specs = {
-      carrot:          { w: 26, h: 44, isBounce: false },
-      flower:          { w: 32, h: 38, isBounce: false },
-      bush:            { w: 42, h: 32, isBounce: false },
-      sleeping_snail:  { w: 34, h: 26, isBounce: false },
-      bounce_mushroom: { w: 38, h: 36, isBounce: true }
+      carrot:           { w: 26, h: 44, isBounce: false },
+      flower:           { w: 32, h: 38, isBounce: false },
+      bush:             { w: 42, h: 32, isBounce: false },
+      sleeping_snail:   { w: 34, h: 26, isBounce: false },
+      bounce_mushroom:  { w: 38, h: 36, isBounce: true },
+      rolling_chestnut: { w: 28, h: 28, isBounce: false },
+      flying_butterfly: { w: 32, h: 28, isBounce: false }
     };
 
     const spec = specs[type] || specs.carrot;
@@ -25,13 +27,24 @@ class Obstacle {
     this.h = spec.h;
     this.isBounce = spec.isBounce;
 
-    // Para el hongo elástico
+    // Para el hongo elástico y rotaciones
     this.squishY = 1;
+    this.rot = 0;
+    this.floatOffset = 0;
   }
 
   update(speed) {
-    this.x -= speed;
+    if (this.type === 'rolling_chestnut') {
+      this.x -= speed * 1.32; // Rueda hacia la izquierda más rápido
+      this.rot -= 0.12;
+    } else {
+      this.x -= speed;
+    }
     this.t += 0.05;
+
+    if (this.type === 'flying_butterfly') {
+      this.floatOffset = Math.sin(this.t * 2.8) * 14;
+    }
 
     if (this.isBounce && this.squishY < 1) {
       this.squishY += (1 - this.squishY) * 0.15;
@@ -44,6 +57,15 @@ class Obstacle {
 
   getHitbox() {
     const pad = CONFIG.HITBOX_PAD;
+    if (this.type === 'flying_butterfly') {
+      const flyY = this.groundY - 55 + this.floatOffset;
+      return {
+        x: this.x - this.w / 2 + pad,
+        y: flyY - this.h / 2 + pad,
+        w: this.w - pad * 2,
+        h: this.h - pad * 2
+      };
+    }
     return {
       x: this.x - this.w / 2 + pad,
       y: this.groundY - this.h + pad,
@@ -66,6 +88,10 @@ class Obstacle {
       this._drawSnail(ctx);
     } else if (this.type === 'bounce_mushroom') {
       this._drawBounceMushroom(ctx);
+    } else if (this.type === 'rolling_chestnut') {
+      this._drawRollingChestnut(ctx);
+    } else if (this.type === 'flying_butterfly') {
+      this._drawFlyingButterfly(ctx);
     }
 
     ctx.restore();
@@ -232,6 +258,81 @@ class Obstacle {
     ctx.beginPath();
     ctx.arc(0, -35, 2, 0, Math.PI * 2);
     ctx.fill();
+
+    ctx.restore();
+  }
+
+  _drawRollingChestnut(ctx) {
+    ctx.save();
+    ctx.translate(0, -14);
+    ctx.rotate(this.rot);
+
+    // Bola de castaña marrón con púas
+    ctx.fillStyle = '#8b5a2b';
+    ctx.beginPath();
+    ctx.arc(0, 0, 12, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Espinas / púas tiernas alrededor
+    ctx.fillStyle = '#654321';
+    for (let i = 0; i < 8; i++) {
+      const a = (i / 8) * Math.PI * 2;
+      ctx.beginPath();
+      ctx.moveTo(Math.cos(a - 0.2) * 11, Math.sin(a - 0.2) * 11);
+      ctx.lineTo(Math.cos(a) * 16, Math.sin(a) * 16);
+      ctx.lineTo(Math.cos(a + 0.2) * 11, Math.sin(a + 0.2) * 11);
+      ctx.closePath();
+      ctx.fill();
+    }
+
+    // Centro con textura
+    ctx.fillStyle = '#b8860b';
+    ctx.beginPath();
+    ctx.arc(0, 0, 5, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.restore();
+  }
+
+  _drawFlyingButterfly(ctx) {
+    ctx.save();
+    ctx.translate(0, -55 + this.floatOffset);
+
+    const flap = Math.sin(this.t * 12);
+
+    // Alitas rosadas y lavanda que aletean
+    ctx.save();
+    ctx.scale(flap, 1);
+
+    ctx.fillStyle = '#f472b6';
+    ctx.beginPath();
+    ctx.ellipse(-8, -6, 10, 6, -0.3, 0, Math.PI * 2);
+    ctx.ellipse(8, -6, 10, 6, 0.3, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.fillStyle = '#c084fc';
+    ctx.beginPath();
+    ctx.ellipse(-6, 3, 7, 5, 0.2, 0, Math.PI * 2);
+    ctx.ellipse(6, 3, 7, 5, -0.2, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.restore();
+
+    // Cuerpo
+    ctx.fillStyle = '#4a2810';
+    ctx.beginPath();
+    ctx.ellipse(0, 0, 2.5, 9, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Antenitas
+    ctx.strokeStyle = '#4a2810';
+    ctx.lineWidth = 1.2;
+    ctx.beginPath();
+    ctx.moveTo(0, -8);
+    ctx.quadraticCurveTo(-3, -13, -5, -14);
+    ctx.moveTo(0, -8);
+    ctx.quadraticCurveTo(3, -13, 5, -14);
+    ctx.stroke();
 
     ctx.restore();
   }

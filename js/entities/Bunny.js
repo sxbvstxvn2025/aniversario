@@ -26,6 +26,9 @@ class Bunny {
 
     // Frames de invulnerabilidad / parpadeo
     this.invulnTimer = 0;
+
+    // Escudo burbuja protector
+    this.hasShield = false;
   }
 
   reset() {
@@ -41,6 +44,7 @@ class Bunny {
     this.jumpBuffer = 0;
     this.doubleJumpEffect = 0;
     this.invulnTimer = 0;
+    this.hasShield = false;
   }
 
   queueJump() {
@@ -262,6 +266,31 @@ class Bunny {
     ctx.beginPath();
     ctx.arc(29, -11, 2.3, 0, Math.PI * 2);
     ctx.fill();
+
+    // 10. ESCUDO BURBUJA PROTECTOR (si está activo)
+    if (this.hasShield) {
+      const bWobble = Math.sin(this.t * 0.15) * 2;
+      const bGrad = ctx.createRadialGradient(-6, -14, 4, 0, -8, 38);
+      bGrad.addColorStop(0, 'rgba(255, 255, 255, 0.7)');
+      bGrad.addColorStop(0.35, 'rgba(56, 189, 248, 0.28)');
+      bGrad.addColorStop(0.75, 'rgba(236, 72, 153, 0.22)');
+      bGrad.addColorStop(1, 'rgba(99, 102, 241, 0.45)');
+
+      ctx.fillStyle = bGrad;
+      ctx.beginPath();
+      ctx.arc(0, -8, 34 + bWobble, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.85)';
+      ctx.lineWidth = 2.2;
+      ctx.stroke();
+
+      // Reflejo brillante de la burbuja
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+      ctx.beginPath();
+      ctx.ellipse(-14, -24, 7, 3, -0.5, 0, Math.PI * 2);
+      ctx.fill();
+    }
 
     ctx.restore();
   }

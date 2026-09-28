@@ -18,9 +18,21 @@ class Collectible {
     } else if (type === 'star') {
       this.points = CONFIG.STAR_PTS;
       this.radius = 16;
-    } else { // strawberry
+    } else if (type === 'strawberry') {
       this.points = CONFIG.STRAWBERRY_PTS;
       this.radius = 15;
+    } else if (type === 'golden_carrot') {
+      this.points = 150;
+      this.radius = 18;
+    } else if (type === 'bubble_shield') {
+      this.points = 40;
+      this.radius = 17;
+    } else if (type === 'rainbow_star') {
+      this.points = 100;
+      this.radius = 18;
+    } else {
+      this.points = CONFIG.HEART_PTS;
+      this.radius = 14;
     }
   }
 
@@ -65,8 +77,16 @@ class Collectible {
       this._drawHeart(ctx);
     } else if (this.type === 'star') {
       this._drawStar(ctx);
-    } else {
+    } else if (this.type === 'strawberry') {
       this._drawStrawberry(ctx);
+    } else if (this.type === 'golden_carrot') {
+      this._drawGoldenCarrot(ctx);
+    } else if (this.type === 'bubble_shield') {
+      this._drawBubbleShield(ctx);
+    } else if (this.type === 'rainbow_star') {
+      this._drawRainbowStar(ctx);
+    } else {
+      this._drawHeart(ctx);
     }
 
     ctx.restore();
@@ -145,6 +165,103 @@ class Collectible {
       ctx.fill();
       ctx.restore();
     }
+  }
+
+  _drawGoldenCarrot(ctx) {
+    const scale = 1 + Math.sin(this.t * 2) * 0.1;
+    ctx.scale(scale, scale);
+
+    // Cuerpo dorado reluciente
+    ctx.fillStyle = '#fbbf24';
+    ctx.shadowColor = '#f59e0b';
+    ctx.shadowBlur = 14;
+    ctx.beginPath();
+    ctx.moveTo(-10, -10);
+    ctx.quadraticCurveTo(0, 14, 10, -10);
+    ctx.closePath();
+    ctx.fill();
+
+    // Franjas de brillo blanco
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineWidth = 1.8;
+    ctx.beginPath();
+    ctx.moveTo(-4, -6);
+    ctx.lineTo(2, 2);
+    ctx.stroke();
+
+    // Hojas doradas / esmeralda
+    ctx.fillStyle = '#10b981';
+    for (const a of [-0.4, 0, 0.4]) {
+      ctx.save();
+      ctx.translate(0, -10);
+      ctx.rotate(a);
+      ctx.beginPath();
+      ctx.ellipse(0, -7, 3, 9, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
+  }
+
+  _drawBubbleShield(ctx) {
+    const scale = 1 + Math.sin(this.t * 1.8) * 0.06;
+    ctx.scale(scale, scale);
+
+    // Esfera iridiscente translúcida
+    const grad = ctx.createRadialGradient(-4, -4, 2, 0, 0, 16);
+    grad.addColorStop(0, 'rgba(255, 255, 255, 0.85)');
+    grad.addColorStop(0.3, 'rgba(56, 189, 248, 0.4)');
+    grad.addColorStop(0.8, 'rgba(236, 72, 153, 0.35)');
+    grad.addColorStop(1, 'rgba(59, 130, 246, 0.6)');
+
+    ctx.fillStyle = grad;
+    ctx.beginPath();
+    ctx.arc(0, 0, 16, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Borde brillante
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.75)';
+    ctx.lineWidth = 1.8;
+    ctx.stroke();
+
+    // Corazoncito tierno en el centro
+    ctx.fillStyle = '#ec4899';
+    ctx.beginPath();
+    ctx.moveTo(0, 1);
+    ctx.bezierCurveTo(-4, -5, -8, 0, 0, 8);
+    ctx.bezierCurveTo(8, 0, 4, -5, 0, 1);
+    ctx.fill();
+  }
+
+  _drawRainbowStar(ctx) {
+    const rot = this.t * 0.8;
+    ctx.rotate(rot);
+
+    // Color que rota con el tiempo
+    const hue = (this.t * 60) % 360;
+    ctx.fillStyle = `hsl(${hue}, 90%, 60%)`;
+    ctx.shadowColor = `hsl(${hue}, 90%, 70%)`;
+    ctx.shadowBlur = 16;
+
+    const points = 5;
+    const outerR = 14;
+    const innerR = 6.5;
+    ctx.beginPath();
+    for (let i = 0; i < points * 2; i++) {
+      const r = (i % 2 === 0) ? outerR : innerR;
+      const angle = (i * Math.PI) / points;
+      const x = Math.sin(angle) * r;
+      const y = -Math.cos(angle) * r;
+      if (i === 0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+    }
+    ctx.closePath();
+    ctx.fill();
+
+    // Núcleo blanco
+    ctx.fillStyle = '#ffffff';
+    ctx.beginPath();
+    ctx.arc(0, 0, 4, 0, Math.PI * 2);
+    ctx.fill();
   }
 }
 
